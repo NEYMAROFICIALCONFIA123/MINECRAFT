@@ -1,0 +1,20 @@
+{
+  "name": "com.ponte.minecraft-unity",
+  "version": "1.0.0",
+  "displayName": "Minecraft Unity Ponte",
+  "description": "Ponte bidirecional Minecraft ↔ Unity. Recebe blocos em tempo real, permite pintar, deletar, controlar tempo/clima.",
+  "unity": "2021.3",
+  "author": {
+    "name": "Ponte Team",
+    "url": "https://github.com/NEYMAROFICIALCONFIA123/MINECRAFT"
+  },
+  "keywords": ["minecraft", "bridge", "voxel", "sync"],
+  "dependencies": {},
+  "samples": [
+    {
+      "displayName": "Demo Scene",
+      "description": "Cena de exemplo com BridgeManager e controles",
+      "path": "Samples~/Demo"
+    }
+  ]
+}

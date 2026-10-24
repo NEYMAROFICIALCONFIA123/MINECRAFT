@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.ponte.mcunity.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "ponte.refmap.json",
+  "mixins": [
+    "ServerWorldMixin"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
