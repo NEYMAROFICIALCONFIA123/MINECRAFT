@@ -6,7 +6,7 @@ pluginManagement {
 }
 
 plugins {
-    id 'fabric-loom' version '1.4-SNAPSHOT'
+    id 'fabric-loom' version '1.8-SNAPSHOT'
 }
 
 dependencyResolutionManagement {
