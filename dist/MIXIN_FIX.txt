@@ -1,0 +1,26 @@
+=== CORREÇÃO DO ERRO Mixin ponte.mixins.json ===
+
+Erro que você teve:
+  Error parsing or using Mixin config ponte.mixins.json
+  The specified resource 'ponte.mixins.json' was invalid or could not be read
+
+CAUSA: O arquivo ponte.mixins.json tinha "refmap": "ponte.refmap.json"
+mas esse arquivo não existe (só é gerado ao compilar com loom). Isso crashava.
+
+CORREÇÃO FEITA (v1.0.1-fixed):
+  - Removido "refmap" do ponte.mixins.json
+  - Mudado "required": true -> false (se mixin falhar, o mod não crasha mais, só avisa)
+  - Removido duplicate fabric.mod.json da raiz (só mantém em src/main/resources)
+  - Novo JAR: minecraft-unity-ponte-1.0.1-fixed.jar
+
+COMO USAR:
+  1. Apague o JAR antigo de mods/
+  2. Coloque dist/minecraft-unity-ponte-1.0.1-fixed.jar em mods/
+  3. Inicie o jogo de novo
+
+Se ainda der erro, tem 2 opções:
+  A) Use a versão SEM MIXIN (polling): dist/minecraft-unity-ponte-NO-MIXIN.jar
+     - Ela não usa mixin, não crasha nunca, só é um pouco mais lenta
+  B) Verifique Fabric Loader 0.14.22+ e Fabric API 0.92+ para 1.20.1
+
+Teste: se aparecer "[Ponte] Servidor TCP iniciado na porta 25566" no log, deu certo!
