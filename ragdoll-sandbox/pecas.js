@@ -1,4 +1,4 @@
-// gerado por tools_fatiar.py — dados das pecas (coords da foto 944x1118)
+// gerado por tools_fatiar.py — 16 pecas, coords da foto 944x1118
 window.PECAS_DADOS = {
  "cabeca": {
   "file": "assets/pecas/cabeca.png",
@@ -6,32 +6,66 @@ window.PECAS_DADOS = {
    393,
    281,
    144,
-   184
+   154
   ],
   "centro": [
    465.0,
-   373.0
+   358.0
+  ],
+  "pivot": [
+   472,
+   418
+  ]
+ },
+ "pescoco": {
+  "file": "assets/pecas/pescoco.png",
+  "bbox": [
+   420,
+   387,
+   99,
+   84
+  ],
+  "centro": [
+   469.5,
+   429.0
   ],
   "pivot": [
    475,
-   448
+   455
   ]
  },
- "tronco": {
-  "file": "assets/pecas/tronco.png",
+ "peito": {
+  "file": "assets/pecas/peito.png",
   "bbox": [
    342,
    428,
-   265,
-   427
+   255,
+   275
   ],
   "centro": [
-   474.5,
-   641.5
+   469.5,
+   565.5
   ],
   "pivot": [
    478,
-   615
+   560
+  ]
+ },
+ "barriga": {
+  "file": "assets/pecas/barriga.png",
+  "bbox": [
+   354,
+   610,
+   253,
+   245
+  ],
+  "centro": [
+   480.5,
+   732.5
+  ],
+  "pivot": [
+   478,
+   655
   ]
  },
  "bracoE": {
@@ -40,15 +74,32 @@ window.PECAS_DADOS = {
    265,
    465,
    128,
-   238
+   205
   ],
   "centro": [
    329.0,
-   584.0
+   567.5
   ],
   "pivot": [
    360,
    495
+  ]
+ },
+ "anteE": {
+  "file": "assets/pecas/anteE.png",
+  "bbox": [
+   266,
+   598,
+   97,
+   100
+  ],
+  "centro": [
+   314.5,
+   648.0
+  ],
+  "pivot": [
+   310,
+   628
   ]
  },
  "bracoD": {
@@ -74,15 +125,32 @@ window.PECAS_DADOS = {
    610,
    576,
    65,
-   218
+   164
   ],
   "centro": [
    642.5,
-   685.0
+   658.0
   ],
   "pivot": [
    644,
    602
+  ]
+ },
+ "maoD": {
+  "file": "assets/pecas/maoD.png",
+  "bbox": [
+   612,
+   704,
+   50,
+   91
+  ],
+  "centro": [
+   637.0,
+   749.5
+  ],
+  "pivot": [
+   638,
+   728
   ]
  },
  "quadril": {
@@ -122,18 +190,35 @@ window.PECAS_DADOS = {
  "canelaE": {
   "file": "assets/pecas/canelaE.png",
   "bbox": [
-   408,
+   420,
    938,
-   92,
-   180
+   80,
+   133
   ],
   "centro": [
-   454.0,
-   1028.0
+   460.0,
+   1004.5
   ],
   "pivot": [
    462,
    975
+  ]
+ },
+ "peE": {
+  "file": "assets/pecas/peE.png",
+  "bbox": [
+   407,
+   1031,
+   92,
+   87
+  ],
+  "centro": [
+   453.0,
+   1074.5
+  ],
+  "pivot": [
+   462,
+   1058
   ]
  },
  "coxaD": {
@@ -158,17 +243,34 @@ window.PECAS_DADOS = {
   "bbox": [
    530,
    938,
-   101,
-   180
+   96,
+   133
   ],
   "centro": [
-   580.5,
-   1028.0
+   578.0,
+   1004.5
   ],
   "pivot": [
    578,
    972
   ]
+ },
+ "peD": {
+  "file": "assets/pecas/peD.png",
+  "bbox": [
+   558,
+   1031,
+   75,
+   87
+  ],
+  "centro": [
+   595.5,
+   1074.5
+  ],
+  "pivot": [
+   590,
+   1058
+  ]
  }
 };
-window.ORDEM_DESENHO = ["bracoE", "canelaE", "coxaE", "canelaD", "coxaD", "quadril", "tronco", "cabeca", "bracoD", "anteD"];
+window.ORDEM_DESENHO = ["bracoE", "anteE", "peE", "canelaE", "coxaE", "peD", "canelaD", "coxaD", "quadril", "barriga", "peito", "pescoco", "cabeca", "bracoD", "anteD", "maoD"];

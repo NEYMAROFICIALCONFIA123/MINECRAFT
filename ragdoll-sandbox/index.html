@@ -23,6 +23,11 @@
   .btn.ativo { background:#19a35b; color:#fff; border-color:#7dffb0; box-shadow:0 0 10px rgba(50,255,140,.4); }
   .btn.destaque { background:#ffb300; border-color:#ffd54f; color:#3a2700; }
   .btn.destaque:hover { background:#ffc233; }
+  .btn.tiktok.ativo { background:linear-gradient(90deg,#25F4EE,#FE2C55); color:#fff; border-color:#fff;
+    box-shadow:0 0 14px rgba(254,44,85,.55); text-shadow:0 1px 2px rgba(0,0,0,.5); }
+  .btn.gravando { background:#FE2C55 !important; color:#fff !important; border-color:#fff !important;
+    animation:piscar 1s infinite; }
+  @keyframes piscar { 50% { opacity:.55; } }
   #topo .espaco { flex:1; }
 
   /* ---------- ferramentas (esquerda) ---------- */
@@ -31,21 +36,22 @@
   #ferramentas .rotulo { font-size:10px; letter-spacing:1.2px; color:#9fe8bb; text-align:center; font-weight:700; }
   .ferr { width:52px; height:52px; border-radius:12px; border:2px solid #27563a; background:#12241a;
     font-size:24px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#cfe9d6; }
-  .ferr span { font-size:8.5px; font-weight:700; letter-spacing:.3px; }
+  .ferr span { font-size:7.4px; font-weight:700; letter-spacing:0; }
   .ferr:hover { border-color:#3fbf72; }
   .ferr.ativa { border-color:#7dffb0; background:#19a35b; box-shadow:0 0 12px rgba(50,255,140,.45); }
 
   /* ---------- painel (direita) ---------- */
-  #painel { position:fixed; right:8px; top:110px; z-index:20; width:248px; max-height:calc(100% - 200px);
+  #painel { position:fixed; right:8px; top:110px; z-index:20; width:252px; max-height:calc(100% - 200px);
     overflow-y:auto; display:flex; flex-direction:column; gap:6px; }
   #painel details { background:rgba(8,20,12,.85); border:1px solid #2ea862; border-radius:12px; padding:7px 9px; backdrop-filter:blur(4px); }
-  #painel summary { cursor:pointer; font-weight:700; font-size:13.5px; color:#b9ffD2; list-style:none; }
+  #painel summary { cursor:pointer; font-weight:700; font-size:13.5px; color:#b9ffd2; list-style:none; }
   #painel summary::-webkit-details-marker { display:none; }
   #painel .grupo { display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
   #painel .btn { font-size:12.5px; padding:5px 8px; border-radius:8px; }
   #painel label { font-size:11.5px; color:#9fe8bb; font-weight:700; display:block; margin-top:7px; }
   #painel select, #painel input[type=text] { width:100%; margin-top:3px; background:#0e2015; color:#eafff0;
     border:1px solid #2ea862; border-radius:8px; padding:6px; font-size:13px; }
+  #painel input[type=range] { width:100%; margin-top:4px; accent-color:#19a35b; }
   #painel p.dica { font-size:12px; line-height:1.55; color:#d7ecdf; margin-top:6px; }
   .adesivo { font-size:20px !important; padding:3px 7px !important; }
 
@@ -61,7 +67,7 @@
     #ferramentas { top:auto; bottom:44px; left:6px; flex-direction:row; flex-wrap:wrap; max-width:calc(100vw - 12px); }
     #ferramentas .rotulo { display:none; }
     .ferr { width:44px; height:44px; font-size:20px; }
-    #painel { top:118px; width:210px; max-height:calc(100% - 250px); }
+    #painel { top:118px; width:212px; max-height:calc(100% - 250px); }
     #dicaBarra { display:none; }
   }
 </style>
@@ -69,12 +75,13 @@
 <body>
 
 <canvas id="tela"></canvas>
-<div id="carregando">⚽ Carregando o craque…<small style="font-size:13px;color:#9fe8bb">fatiando a foto em braços e pernas 🧩</small></div>
+<div id="carregando">⚽ Carregando o craque…<small style="font-size:13px;color:#9fe8bb">montando 16 peças e 15 articulações 🧩</small></div>
 
 <header id="topo">
-  <h1>⚽ RAGDOLL DO CRAQUE<small>SANDBOX DA FOTO • CAMISA 1</small></h1>
-  <button class="btn" id="btnPose" title="Congela a física: arrasta os braços/pernas pra girar e o tronco pra mudar de lugar (P)">🧍 Modo Pose</button>
-  <button class="btn" id="btnPausar" title="Pausa a física (Espaço)">⏸️ Pausar</button>
+  <h1>⚽ RAGDOLL DO CRAQUE<small>SANDBOX DA FOTO • 15 ARTICULAÇÕES</small></h1>
+  <button class="btn" id="btnPose" title="Congela a física: arrasta os braços/pernas pra girar e o peito pra mudar de lugar (P)">🧍 Modo Pose</button>
+  <button class="btn tiktok" id="btnTween" title="Ele dança sozinho no estilo tweening do TikTok e dá pra gravar! (T)">📱 TweenSlop</button>
+  <button class="btn" id="btnPausar" title="Pausa tudo (Espaço)">⏸️ Pausar</button>
   <button class="btn" id="btnReset" title="Recria o jogador no meio da tela (R)">🔄 Resetar</button>
   <button class="btn" id="btnPulo" title="Lança ele pra cima!">🚀 Super Pulo</button>
   <span class="espaco"></span>
@@ -116,11 +123,39 @@
     </div>
     <div class="grupo">
       <button class="btn ativo" id="btnChuteira">👟 Chuteiras</button>
+      <button class="btn ativo" id="btnSombras">🌑 Sombras</button>
     </div>
   </details>
 
-  <details open>
-    <summary>🎨 Cenário &amp; Física</summary>
+  <details id="detTween">
+    <summary>📱 Modo TweenSlop (TikTok)</summary>
+    <p class="dica">Ele <b>dança sozinho</b> no estilo tweening: poses ligadas por
+      <b>keyframes com bounce/elastic</b>, zoom no beat, phonk sintetizado e moldura 9:16.
+      É só ligar no botão <b>📱 TweenSlop</b> lá em cima, gravar e postar! 🔥</p>
+    <label>Animação</label>
+    <select id="selAnim">
+      <option value="dancinha">🕺 Dancinha viral</option>
+      <option value="gol">⚽ Corre → chuta → GOOOL</option>
+      <option value="phonk">😈 Edit phonk (cortes rápidos)</option>
+      <option value="aleatorio">🎲 Bagunça aleatória</option>
+    </select>
+    <label>BPM do beat: <span id="bpmVal">132</span></label>
+    <input type="range" id="rngBpm" min="80" max="180" value="132">
+    <label>Texto gigante do vídeo</label>
+    <input type="text" id="txtTween" value="O CRAQUE TÁ ON 🔥" maxlength="40">
+    <div class="grupo">
+      <button class="btn ativo" id="btn12fps" title="Trava a animação em 12 quadros por segundo, igual aos edits clássicos">🎞️ 12 FPS slop</button>
+      <button class="btn ativo" id="btnTrilhas">👻 Trilhas</button>
+      <button class="btn ativo" id="btnBeatSom">🥁 Beat phonk</button>
+    </div>
+    <div class="grupo">
+      <button class="btn destaque" id="btnGravar">⏺️ Gravar TikTok (até 15s)</button>
+    </div>
+    <p class="dica" id="recStatus"></p>
+  </details>
+
+  <details>
+    <summary>🎨 Cenário &amp; Física 2.0</summary>
     <label>Fundo da cena</label>
     <select id="selFundo">
       <option value="quadra">🏟️ Quadra azul</option>
@@ -137,7 +172,12 @@
       <option value="1" selected>🌍 Terra</option>
       <option value="2.2">🪐 Júpiter (pesadão)</option>
     </select>
+    <label>💪 Tônus muscular: <span id="tonusVal">25%</span> <small>(molengo ↔ durão)</small></label>
+    <input type="range" id="rngTonus" min="0" max="100" value="25">
+    <p class="dica">Com tônus, os músculos dele tentam voltar pra pose escolhida.
+      As juntas agora têm <b>limite</b> (nada de pescoço girando 360° 👻).</p>
     <div class="grupo">
+      <button class="btn ativo" id="btnAutoColisao" title="Braços e pernas batem no próprio corpo em vez de atravessar">💥 Auto-colisão</button>
       <button class="btn" id="btnLento">🐢 Câmera lenta</button>
       <button class="btn" id="btnLimpar">🧹 Limpar objetos</button>
     </div>
@@ -182,152 +222,229 @@
   <details>
     <summary>❓ Como jogar</summary>
     <p class="dica">
-      ✋ <b>Arrasta qualquer parte</b> do corpo dele pra puxar, girar e <b>jogar ele longe</b>!<br><br>
-      🧍 <b>Modo Pose</b>: a física congela — arrasta um <b>braço/perna/cabeça</b> pra girar na junta,
-      arrasta o <b>tronco</b> (ou o céu) pra <b>mudar ele de lugar</b>. Rodinha do mouse gira devagarinho.<br><br>
-      🧨 A <b>TNT explode sozinha</b> em 3s… e explode as outras junto!<br><br>
-      ⌨️ Teclas: <b>1–9</b> ferramentas • <b>P</b> pose • <b>Espaço</b> pausar • <b>R</b> resetar<br><br>
-      📸 Monta a pose, escolhe o fundo e <b>tira a foto</b> pra mandar pros amigos!
+      ✋ <b>Arrasta qualquer parte</b> do corpo dele pra puxar, girar e <b>jogar ele longe</b>!
+      Agora o corpo tem <b>15 articulações</b> (até pescoço, pulso e tornozelo!),
+      <b>limite nas juntas</b>, <b>auto-colisão</b> e <b>sombras de verdade</b> 🌑<br><br>
+      🧍 <b>Modo Pose</b>: a física congela — arrasta um <b>membro</b> pra girar na junta,
+      arrasta o <b>peito</b> (ou o céu) pra <b>mudar ele de lugar</b>. Rodinha do mouse gira devagarinho.<br><br>
+      📱 <b>TweenSlop</b>: ele dança sozinho no beat (estilo edit do TikTok). Aperta
+      <b>⏺️ Gravar</b> no painel pra baixar o vídeo 9:16 com som e postar!<br><br>
+      💪 <b>Tônus muscular</b>: no máximo ele fica durão tentando segurar a pose; no zero vira gelatina.<br><br>
+      ⌨️ Teclas: <b>1–9</b> ferramentas • <b>P</b> pose • <b>T</b> tweenslop • <b>Espaço</b> pausar • <b>R</b> resetar
     </p>
   </details>
 </aside>
 
-<div id="dicaBarra">✋ Arrasta o braço, a perna, a cabeça… e joga ele longe! Liga o 🧍 Modo Pose pra montar a pose perfeita e tirar 📸</div>
+<div id="dicaBarra">✋ Arrasta ele por qualquer junta (tem 15 agora!) • 🧍 Modo Pose pra montar a pose • 📱 TweenSlop pra ele dançar e você gravar pro TikTok!</div>
 
 <script src="lib/matter.min.js"></script>
 <script src="pecas.js"></script>
 <script>
 'use strict';
 /* =====================================================================
-   RAGDOLL DO CRAQUE — sandbox com a foto fatiada em pecas articuladas
-   Fisica: Matter.js | Desenho: Canvas 2D (as pecas sao PNGs da foto)
+   RAGDOLL DO CRAQUE 2.0 — 16 pecas / 15 articulacoes com limite e tonus,
+   auto-colisao, sombras projetadas e Modo TweenSlop (tweening estilo
+   Alight Motion/CapCut com beat sintetizado + gravador 9:16).
+   Fisica: Matter.js @120Hz | Desenho: Canvas 2D
    ===================================================================== */
 const { Engine, Bodies, Body, Composite, Constraint, Events, Query } = Matter;
 
 const tela = document.getElementById('tela');
 const ctx = tela.getContext('2d');
+const $ = id => document.getElementById(id);
 let L = innerWidth, A = innerHeight, DPR = Math.min(devicePixelRatio || 1, 2);
 let chaoY = A - 64;
 
 /* ---------------- estado ---------------- */
 let ferramenta = 'mao';
-let poseModo = false, pausado = false, lento = false, somLigado = true, chuteiras = true;
-let escala = 0.45;                 // tamanho do jogador (foto -> tela)
-let craque = null;                 // { corpos:{nome:body}, ligacoes:[...] }
-let objetos = [];                  // bodies soltos (bola, caixa, TNT...)
-let estaticos = [];                // chao/paredes
-let particulas = [];
-let tremida = 0;
-let fundoAtual = 'quadra', fundoCanvas = null;
-let ultimoTudum = 0;
+let poseModo = false, tweenModo = false, pausado = false, lento = false;
+let somLigado = true, chuteiras = true, sombrasLigadas = true, autoColisao = true;
+let escala = 0.45;
+let craque = null, objetos = [], estaticos = [], particulas = [];
+let tremida = 0, fundoAtual = 'quadra', fundoCanvas = null, ultimoTudum = 0;
+let tonus = 0.25;                       // forca dos "musculos" (0..1)
+let poseAlvoRel = {};                   // angulo desejado de cada junta (relativo)
 
-/* hierarquia do corpo: quem e filho de quem (a junta e o 'pivot' do filho) */
-const MAE = { cabeca:'tronco', bracoE:'tronco', bracoD:'tronco', anteD:'bracoD',
-              quadril:'tronco', coxaE:'quadril', canelaE:'coxaE', coxaD:'quadril', canelaD:'coxaD' };
-const FK_ORDEM = ['tronco','cabeca','bracoE','bracoD','anteD','quadril','coxaE','canelaE','coxaD','canelaD'];
-const NOMES = { cabeca:'Cabeça', tronco:'Tronco', bracoE:'Braço esquerdo', bracoD:'Braço direito',
-  anteD:'Antebraço', quadril:'Quadril', coxaE:'Coxa esquerda', canelaE:'Canela esquerda',
-  coxaD:'Coxa direita', canelaD:'Canela direita' };
-/* onde desenhar a chuteira 👟 (offset na foto a partir do centro da peca) */
-const PE = { canelaE:[8,86], canelaD:[12,86] };
+/* ---------------- esqueleto (16 pecas / 15 juntas) ---------------- */
+const MAE = { pescoco:'peito', cabeca:'pescoco', bracoE:'peito', anteE:'bracoE',
+  bracoD:'peito', anteD:'bracoD', maoD:'anteD', barriga:'peito', quadril:'barriga',
+  coxaE:'quadril', canelaE:'coxaE', peE:'canelaE', coxaD:'quadril', canelaD:'coxaD', peD:'canelaD' };
+const FK_ORDEM = ['peito','pescoco','cabeca','bracoE','anteE','bracoD','anteD','maoD',
+  'barriga','quadril','coxaE','canelaE','peE','coxaD','canelaD','peD'];
+/* limite de cada junta em graus (pra nada girar igual A menina do exorcista) */
+const LIMITE = { pescoco:38, cabeca:48, bracoE:178, anteE:155, bracoD:178, anteD:155,
+  maoD:75, barriga:42, quadril:38, coxaE:145, canelaE:150, peE:65, coxaD:145, canelaD:150, peD:65 };
+/* ponto da foto onde vai a chuteira (na ponta do pe) */
+const CHUTEIRA_EM = { peE:[462,1112], peD:[592,1112] };
 
-const POSES = { // angulos em graus (0 = exatamente como na foto)
-  emPe:        { tronco:0,   cabeca:-3, bracoE:10,   bracoD:20,  anteD:8,   quadril:0,  coxaE:6,   canelaE:4,  coxaD:12,  canelaD:10 },
-  correndo:    { tronco:0,   cabeca:0,  bracoE:0,    bracoD:0,   anteD:0,   quadril:0,  coxaE:0,   canelaE:0,  coxaD:0,   canelaD:0 },
-  comemorando: { tronco:-4,  cabeca:-8, bracoE:-140, bracoD:155, anteD:170, quadril:0,  coxaE:12,  canelaE:10, coxaD:20,  canelaD:45 },
-  chute:       { tronco:6,   cabeca:0,  bracoE:40,   bracoD:-30, anteD:-15, quadril:4,  coxaE:8,   canelaE:6,  coxaD:-92, canelaD:-78 },
-  espacate:    { tronco:0,   cabeca:-4, bracoE:-60,  bracoD:70,  anteD:60,  quadril:0,  coxaE:82,  canelaE:84, coxaD:-70, canelaD:-72 },
-  voando:      { tronco:88,  cabeca:80, bracoE:-95,  bracoD:-80, anteD:-85, quadril:88, coxaE:93,  canelaE:91, coxaD:97,  canelaD:95 },
-  dancando:    { tronco:-6,  cabeca:12, bracoE:-120, bracoD:60,  anteD:130, quadril:4,  coxaE:25,  canelaE:55, coxaD:-15, canelaD:-5 },
-  dormindo:    { tronco:90,  cabeca:97, bracoE:100,  bracoD:106, anteD:100, quadril:90, coxaE:95,  canelaE:93, coxaD:86,  canelaD:88 },
+const POSES = { // angulos absolutos em graus (0 = igualzinho a foto)
+  emPe:        { peito:0, barriga:0, pescoco:-2, cabeca:-2, bracoE:10, anteE:-8, bracoD:20, anteD:8, maoD:5, quadril:0, coxaE:6, canelaE:4, peE:2, coxaD:12, canelaD:10, peD:8 },
+  correndo:    {},
+  comemorando: { peito:-4, barriga:-2, pescoco:-6, cabeca:-8, bracoE:-140, anteE:-165, bracoD:155, anteD:170, maoD:178, quadril:0, coxaE:12, canelaE:10, peE:20, coxaD:20, canelaD:45, peD:55 },
+  chute:       { peito:6, barriga:10, pescoco:0, cabeca:-4, bracoE:40, anteE:65, bracoD:-30, anteD:-15, maoD:-25, quadril:4, coxaE:8, canelaE:6, peE:0, coxaD:-92, canelaD:-78, peD:-95 },
+  espacate:    { peito:0, barriga:0, pescoco:-3, cabeca:-3, bracoE:-60, anteE:-80, bracoD:70, anteD:60, maoD:80, quadril:0, coxaE:82, canelaE:84, peE:95, coxaD:-70, canelaD:-72, peD:-85 },
+  voando:      { peito:88, barriga:90, pescoco:84, cabeca:78, bracoE:-95, anteE:-100, bracoD:-80, anteD:-85, maoD:-90, quadril:89, coxaE:93, canelaE:91, peE:100, coxaD:97, canelaD:95, peD:105 },
+  dancando:    { peito:-6, barriga:4, pescoco:8, cabeca:14, bracoE:-120, anteE:-150, bracoD:60, anteD:130, maoD:150, quadril:8, coxaE:25, canelaE:55, peE:40, coxaD:-15, canelaD:-5, peD:10 },
+  dormindo:    { peito:90, barriga:92, pescoco:95, cabeca:100, bracoE:100, anteE:115, bracoD:106, anteD:100, maoD:110, quadril:91, coxaE:95, canelaE:93, peE:100, coxaD:86, canelaD:88, peD:95 },
 };
 
 /* ---------------- utilidades ---------------- */
 const rad = g => g * Math.PI / 180;
-function rot(v, graus) { const t = rad(graus), c = Math.cos(t), s = Math.sin(t);
-  return { x: v.x * c - v.y * s, y: v.x * s + v.y * c }; }
+const graus = r => r * 180 / Math.PI;
+function envolverGraus(d){ return ((d + 180) % 360 + 360) % 360 - 180; } // -180..180
+function rot(v, emGraus){ const t = rad(emGraus), c = Math.cos(t), s = Math.sin(t);
+  return { x: v.x*c - v.y*s, y: v.x*s + v.y*c }; }
 function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a);
   t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
-const centro = n => PECAS_DADOS[n].centro;
-const pivot  = n => PECAS_DADOS[n].pivot;
-function descendentes(nome){ // a peca + todos os filhos/netos...
-  const r = [nome]; for (const k in MAE) if (MAE[k] === nome) r.push(...descendentes(k)); return r; }
-/* ponto da foto -> ponto do mundo, dado o corpo da peca */
+const centroP = n => PECAS_DADOS[n].centro;
+const pivotP  = n => PECAS_DADOS[n].pivot;
+function descendentes(nome){ const r=[nome];
+  for (const k in MAE) if (MAE[k]===nome) r.push(...descendentes(k)); return r; }
 function fotoParaMundo(nome, pontoFoto){
-  const b = craque.corpos[nome], c = centro(nome);
-  const local = { x:(pontoFoto[0]-c[0])*escala, y:(pontoFoto[1]-c[1])*escala };
-  const r = rot(local, b.angle * 180/Math.PI);
-  return { x: b.position.x + r.x, y: b.position.y + r.y };
+  const b = craque.corpos[nome], c = centroP(nome);
+  const r = rot({ x:(pontoFoto[0]-c[0])*escala, y:(pontoFoto[1]-c[1])*escala }, graus(b.angle));
+  return { x:b.position.x+r.x, y:b.position.y+r.y };
+}
+const juntaMundo = (mae, filho) => fotoParaMundo(mae, pivotP(filho));
+
+/* cinematica direta: dada a posicao do peito e os angulos, onde fica cada peca? */
+function calcularPosicoes(angulos, raiz){
+  const pos = { peito:{ x:raiz.x, y:raiz.y } };
+  for (const nome of FK_ORDEM.slice(1)){
+    const mae = MAE[nome], j = pivotP(nome), cm = centroP(mae), cp = centroP(nome);
+    const jw  = rot({ x:(j[0]-cm[0])*escala,  y:(j[1]-cm[1])*escala },  angulos[mae]||0);
+    const off = rot({ x:(cp[0]-j[0])*escala,  y:(cp[1]-j[1])*escala },  angulos[nome]||0);
+    pos[nome] = { x: pos[mae].x+jw.x+off.x, y: pos[mae].y+jw.y+off.y };
+  }
+  return pos;
+}
+function posicionarCraque(angulos, raiz){
+  const pos = calcularPosicoes(angulos, raiz);
+  for (const nome of FK_ORDEM){ const b = craque.corpos[nome];
+    Body.setPosition(b, pos[nome]); Body.setAngle(b, rad(angulos[nome]||0));
+    Body.setVelocity(b,{x:0,y:0}); Body.setAngularVelocity(b,0); }
+}
+function definirPoseAlvo(pose){
+  poseAlvoRel = {};
+  for (const nome of FK_ORDEM.slice(1))
+    poseAlvoRel[nome] = envolverGraus((pose[nome]||0) - (pose[MAE[nome]]||0));
 }
 
-/* ---------------- motor ---------------- */
-const engine = Engine.create();
+/* ---------------- colisao: cada peca uma categoria ----------------
+   Mae/filha e vizinhas coladas na foto NAO colidem; o resto do corpo
+   bate nele mesmo (braco esbarra na perna etc.) = auto-colisao.      */
+const CAT_MUNDO = 0x0001, MASCARA_MUNDO = 0x1FFFF;
+const FILTRO_MUNDO = () => ({ category: CAT_MUNDO, mask: MASCARA_MUNDO });
+const catPeca = nome => 0x0002 << FK_ORDEM.indexOf(nome);
+function sobrepoeNaFoto(a, b){ // area de encontro das caixas encolhidas (na foto)
+  const bb = n => { const d = PECAS_DADOS[n], [cx,cy] = d.centro;
+    return [cx-d.bbox[2]*0.41, cy-d.bbox[3]*0.44, cx+d.bbox[2]*0.41, cy+d.bbox[3]*0.44]; };
+  const A = bb(a), B = bb(b);
+  return Math.max(0, Math.min(A[2],B[2])-Math.max(A[0],B[0])) *
+         Math.max(0, Math.min(A[3],B[3])-Math.max(A[1],B[1]));
+}
+function filtroPeca(nome){
+  let mascara = CAT_MUNDO;
+  if (autoColisao) for (const outra of FK_ORDEM){
+    if (outra===nome || MAE[outra]===nome || MAE[nome]===outra) continue;
+    if (sobrepoeNaFoto(nome, outra) > 0) continue; // vizinhas encostadas na foto
+    mascara |= catPeca(outra);
+  }
+  return { category: catPeca(nome), mask: mascara };
+}
+function atualizarFiltros(){
+  if (!craque) return;
+  for (const nome of FK_ORDEM) craque.corpos[nome].collisionFilter = filtroPeca(nome);
+}
+
+/* ---------------- motor (fisica 2.0: mais iteracoes + 120Hz) ---------------- */
+const engine = Engine.create({ positionIterations:10, velocityIterations:8, constraintIterations:6 });
 engine.gravity.y = 1;
 
 function criarLimites(){
   for (const b of estaticos) Composite.remove(engine.world, b);
+  const f = FILTRO_MUNDO();
   estaticos = [
-    Bodies.rectangle(L/2, chaoY + 40, L + 400, 80, { isStatic:true, label:'chao' }),
-    Bodies.rectangle(-35, A/2, 70, A*3, { isStatic:true, label:'parede' }),
-    Bodies.rectangle(L+35, A/2, 70, A*3, { isStatic:true, label:'parede' }),
+    Bodies.rectangle(L/2, chaoY+40, L+400, 80, { isStatic:true, label:'chao', friction:0.9, collisionFilter:f }),
+    Bodies.rectangle(-35, A/2, 70, A*3, { isStatic:true, label:'parede', collisionFilter:f }),
+    Bodies.rectangle(L+35, A/2, 70, A*3, { isStatic:true, label:'parede', collisionFilter:f }),
   ];
   Composite.add(engine.world, estaticos);
 }
 
-/* monta (ou remonta) o jogador com cinematica direta a partir dos angulos */
 function montarCraque(x, y, angulos){
   if (craque){ for (const n in craque.corpos) Composite.remove(engine.world, craque.corpos[n]);
                for (const c of craque.ligacoes) Composite.remove(engine.world, c); }
-  const pos = { tronco:{ x, y } };
-  for (const nome of FK_ORDEM.slice(1)){
-    const mae = MAE[nome], junta = pivot(nome), cm = centro(mae), cp = centro(nome);
-    const jw = rot({ x:(junta[0]-cm[0])*escala, y:(junta[1]-cm[1])*escala }, angulos[mae]);
-    const off = rot({ x:(cp[0]-junta[0])*escala, y:(cp[1]-junta[1])*escala }, angulos[nome]);
-    pos[nome] = { x: pos[mae].x + jw.x + off.x, y: pos[mae].y + jw.y + off.y };
-  }
+  const pos = calcularPosicoes(angulos, {x,y});
   const corpos = {};
   for (const nome of FK_ORDEM){
     const d = PECAS_DADOS[nome];
+    const pesada = (nome==='peito' || nome==='barriga');
     corpos[nome] = Bodies.rectangle(pos[nome].x, pos[nome].y,
-      Math.max(14, d.bbox[2]*escala*0.82), Math.max(14, d.bbox[3]*escala*0.88), {
-      angle: rad(angulos[nome]), label:'peca:'+nome,
+      Math.max(12, d.bbox[2]*escala*0.82), Math.max(12, d.bbox[3]*escala*0.88), {
+      angle: rad(angulos[nome]||0), label:'peca:'+nome, slop:0.02,
       chamfer:{ radius: Math.min(d.bbox[2], d.bbox[3])*escala*0.28 },
-      friction:0.6, frictionAir:0.016, restitution:0.05,
-      density: nome==='tronco' ? 0.0016 : 0.001,
-      collisionFilter:{ group:-1 },   // pecas nao batem uma na outra
+      friction: (nome==='peE'||nome==='peD') ? 0.95 : 0.55,   // chuteira agarra!
+      frictionStatic: 0.9, frictionAir: pesada ? 0.012 : 0.018, restitution: 0.05,
+      density: pesada ? 0.0016 : 0.001,
+      collisionFilter: filtroPeca(nome),
     });
   }
   const ligacoes = [];
   for (const nome of FK_ORDEM.slice(1)){
-    const mae = MAE[nome], junta = pivot(nome), cm = centro(mae), cp = centro(nome);
+    const mae = MAE[nome], j = pivotP(nome), cm = centroP(mae), cp = centroP(nome);
     ligacoes.push(Constraint.create({
-      bodyA: corpos[mae], pointA:{ x:(junta[0]-cm[0])*escala, y:(junta[1]-cm[1])*escala },
-      bodyB: corpos[nome], pointB:{ x:(junta[0]-cp[0])*escala, y:(junta[1]-cp[1])*escala },
+      bodyA: corpos[mae],  pointA:{ x:(j[0]-cm[0])*escala, y:(j[1]-cm[1])*escala },
+      bodyB: corpos[nome], pointB:{ x:(j[0]-cp[0])*escala, y:(j[1]-cp[1])*escala },
       length:0, stiffness:0.95, damping:0.08,
     }));
   }
   Composite.add(engine.world, [...Object.values(corpos), ...ligacoes]);
   craque = { corpos, ligacoes };
+  definirPoseAlvo(angulos);
 }
 
-/* aplica uma pose mantendo o tronco onde esta (gira junto com ele) */
+/* musculos (tonus) + limite das juntas — roda a cada subpasso da fisica */
+function girarCorpoAoRedor(b, ponto, deltaRad){
+  const r = rot({ x:b.position.x-ponto.x, y:b.position.y-ponto.y }, graus(deltaRad));
+  Body.setPosition(b, { x:ponto.x+r.x, y:ponto.y+r.y });
+  Body.setAngle(b, b.angle + deltaRad);
+}
+function aplicarTonusELimites(){
+  if (!craque) return;
+  for (const nome of FK_ORDEM.slice(1)){
+    const bP = craque.corpos[MAE[nome]], b = craque.corpos[nome];
+    const rel = envolverGraus(graus(b.angle - bP.angle)); // na foto, toda junta = 0
+    if (tonus > 0){ // mola angular tentando voltar pra pose
+      const erro = rad(envolverGraus((poseAlvoRel[nome]||0) - rel));
+      Body.setAngularVelocity(b,  b.angularVelocity  + erro*tonus*0.055);
+      Body.setAngularVelocity(bP, bP.angularVelocity - erro*tonus*0.012);
+    }
+    const lim = LIMITE[nome] ?? 170;
+    if (Math.abs(rel) > lim){ // passou do limite: empurra de volta e mata o giro
+      const excesso = rad(rel - Math.sign(rel)*lim);
+      girarCorpoAoRedor(b, juntaMundo(MAE[nome], nome), -excesso*0.7);
+      const giroRel = b.angularVelocity - bP.angularVelocity;
+      Body.setAngularVelocity(b, bP.angularVelocity + giroRel*0.15 - excesso*0.6);
+    } else if (Math.abs(rel) > lim*0.82){ // chegando no limite: freia antes de bater
+      const giroRel = b.angularVelocity - bP.angularVelocity;
+      if (Math.sign(giroRel) === Math.sign(rel))
+        Body.setAngularVelocity(b, b.angularVelocity - giroRel*0.25);
+    }
+    const MAX_GIRO = 0.85; // teto de velocidade de giro (senão vira helicóptero)
+    if (Math.abs(b.angularVelocity) > MAX_GIRO)
+      Body.setAngularVelocity(b, Math.sign(b.angularVelocity)*MAX_GIRO);
+  }
+}
+
 function aplicarPose(pose){
   if (!craque) return;
-  const t = craque.corpos.tronco;
-  const base = t.angle*180/Math.PI - (pose.tronco||0);
+  if (tweenModo) alternarTween(false);
+  const t = craque.corpos.peito;
+  const base = graus(t.angle) - (pose.peito||0);
   const ang = {}; for (const n of FK_ORDEM) ang[n] = (pose[n]||0) + base;
-  const pos = { tronco:{ x:t.position.x, y:t.position.y } };
-  for (const nome of FK_ORDEM.slice(1)){
-    const mae = MAE[nome], junta = pivot(nome), cm = centro(mae), cp = centro(nome);
-    const jw = rot({ x:(junta[0]-cm[0])*escala, y:(junta[1]-cm[1])*escala }, ang[mae]);
-    const off = rot({ x:(cp[0]-junta[0])*escala, y:(cp[1]-junta[1])*escala }, ang[nome]);
-    pos[nome] = { x: pos[mae].x+jw.x+off.x, y: pos[mae].y+jw.y+off.y };
-  }
-  for (const nome of FK_ORDEM){
-    const b = craque.corpos[nome];
-    Body.setPosition(b, pos[nome]); Body.setAngle(b, rad(ang[nome]));
-    Body.setVelocity(b, {x:0,y:0}); Body.setAngularVelocity(b, 0);
-  }
+  posicionarCraque(ang, { x:t.position.x, y:t.position.y });
+  definirPoseAlvo(pose);
   tocarSom('pop');
 }
 
@@ -342,10 +459,9 @@ function removerObjeto(body){
   objetos = objetos.filter(o => o !== body); Composite.remove(engine.world, body); atualizarContador();
 }
 function atualizarContador(){
-  document.getElementById('contador').textContent =
-    objetos.length ? `🧸 ${objetos.length} objeto(s) na cena` : '';
+  $('contador').textContent = objetos.length ? `🧸 ${objetos.length} objeto(s) na cena` : '';
 }
-const opSolto = { friction:0.4, frictionAir:0.008, restitution:0.35, density:0.001 };
+const opSolto = { friction:0.4, frictionAir:0.008, restitution:0.35, density:0.001, slop:0.02, collisionFilter:FILTRO_MUNDO() };
 function soltarBola(x,y){ const r = 22+Math.random()*14;
   adicionarObjeto(Bodies.circle(x,y,r,{...opSolto, restitution:0.75, label:'bola'}), {tipo:'bola', r}); }
 function soltarCaixa(x,y){ const t = 42+Math.random()*26;
@@ -353,21 +469,88 @@ function soltarCaixa(x,y){ const t = 42+Math.random()*26;
 function soltarBloco(x,y){ const t = 48;
   adicionarObjeto(Bodies.rectangle(x,y,t,t,{...opSolto, label:'bloco'}), {tipo:'bloco', t}); }
 function soltarTNT(x,y){ const t = 46;
-  const b = Bodies.rectangle(x,y,t,t,{...opSolto, label:'tnt'});
-  adicionarObjeto(b, {tipo:'tnt', t, explodeEm: performance.now()+3000}); tocarSom('pop'); }
+  adicionarObjeto(Bodies.rectangle(x,y,t,t,{...opSolto, label:'tnt'}),
+    {tipo:'tnt', t, explodeEm: performance.now()+3000}); tocarSom('pop'); }
 function soltarEmoji(x,y,emoji){ const t = 44;
   adicionarObjeto(Bodies.rectangle(x,y,t,t,{...opSolto, label:'adesivo'}), {tipo:'emoji', t, emoji}); }
 function colocarTrampolim(x,y){ const w=160,h=16;
   adicionarObjeto(Bodies.rectangle(x, Math.min(y, chaoY-h/2-14), w, h,
-    { isStatic:true, restitution:1.35, friction:0, label:'trampolim' }), {tipo:'trampolim', w, h}); }
+    { isStatic:true, restitution:1.35, friction:0, label:'trampolim', collisionFilter:FILTRO_MUNDO() }),
+    {tipo:'trampolim', w, h}); }
 function criarPlataforma(p1,p2){
   const dx=p2.x-p1.x, dy=p2.y-p1.y, comp=Math.hypot(dx,dy); if (comp<30) return;
   adicionarObjeto(Bodies.rectangle((p1.x+p2.x)/2,(p1.y+p2.y)/2, comp, 15,
-    { isStatic:true, angle:Math.atan2(dy,dx), friction:0.7, label:'plataforma' }),
+    { isStatic:true, angle:Math.atan2(dy,dx), friction:0.7, label:'plataforma', collisionFilter:FILTRO_MUNDO() }),
     {tipo:'plataforma', w:comp, h:15});
 }
 
-/* ---------------- explosao / particulas / som ---------------- */
+/* ---------------- audio (com saida p/ gravar junto no video!) ---------------- */
+let audioCtx = null, masterGain = null, audioStreamDest = null;
+function ensureAudio(){
+  try{
+    if (!audioCtx){
+      audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      masterGain = audioCtx.createGain(); masterGain.gain.value = 0.9;
+      masterGain.connect(audioCtx.destination);
+      audioStreamDest = audioCtx.createMediaStreamDestination();
+      masterGain.connect(audioStreamDest); // o mesmo som vai pro video
+    }
+    if (audioCtx.state==='suspended') audioCtx.resume();
+  }catch(e){ /* sem audio, sem problema */ }
+}
+function tocarSom(tipo){
+  if (!somLigado || !audioCtx) return;
+  try{
+    const t = audioCtx.currentTime;
+    if (tipo==='boom'){
+      const buf = audioCtx.createBuffer(1, audioCtx.sampleRate*0.5, audioCtx.sampleRate);
+      const d = buf.getChannelData(0); for (let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length);
+      const src = audioCtx.createBufferSource(); src.buffer=buf;
+      const f = audioCtx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=420;
+      const g = audioCtx.createGain(); g.gain.setValueAtTime(0.9,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.5);
+      src.connect(f); f.connect(g); g.connect(masterGain); src.start();
+    } else {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type='sine'; const f0 = tipo==='pop'?520:130;
+      o.frequency.setValueAtTime(f0,t); o.frequency.exponentialRampToValueAtTime(f0*0.45,t+0.12);
+      g.gain.setValueAtTime(tipo==='pop'?0.18:0.3,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.14);
+      o.connect(g); g.connect(masterGain); o.start(); o.stop(t+0.15);
+    }
+  }catch(e){}
+}
+/* beat de funk/phonk 100% sintetizado: bumbo, chimbal e "cowbell" */
+function tocarKick(t){
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.type='sine'; o.frequency.setValueAtTime(155,t); o.frequency.exponentialRampToValueAtTime(42,t+0.16);
+  g.gain.setValueAtTime(0.95,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.2);
+  o.connect(g); g.connect(masterGain); o.start(t); o.stop(t+0.22);
+}
+function tocarHat(t){
+  const buf = audioCtx.createBuffer(1, audioCtx.sampleRate*0.05, audioCtx.sampleRate);
+  const d = buf.getChannelData(0); for (let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length);
+  const s = audioCtx.createBufferSource(); s.buffer=buf;
+  const f = audioCtx.createBiquadFilter(); f.type='highpass'; f.frequency.value=7000;
+  const g = audioCtx.createGain(); g.gain.setValueAtTime(0.22,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.05);
+  s.connect(f); f.connect(g); g.connect(masterGain); s.start(t);
+}
+function tocarCowbell(t, freq){
+  const g = audioCtx.createGain(); g.gain.setValueAtTime(0.30,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.28);
+  const f = audioCtx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=900; f.Q.value=1.1;
+  for (const mult of [1, 1.51]){ const o = audioCtx.createOscillator();
+    o.type='square'; o.frequency.value = freq*mult; o.connect(f); o.start(t); o.stop(t+0.3); }
+  f.connect(g); g.connect(masterGain);
+}
+const MELODIA_PHONK = [523.25, 0, 523.25, 659.25, 0, 783.99, 659.25, 587.33]; // por colcheia
+function tocarColcheia(idx){
+  if (!beatSom || !somLigado || !audioCtx) return;
+  try{
+    const t = audioCtx.currentTime + 0.01;
+    if (idx % 2 === 0) tocarKick(t); else tocarHat(t);
+    const nota = MELODIA_PHONK[idx % 8]; if (nota) tocarCowbell(t, nota);
+  }catch(e){}
+}
+
+/* ---------------- explosao / particulas ---------------- */
 function explodir(x, y, forca=17, raio=280){
   const alvos = [...(craque?Object.values(craque.corpos):[]), ...objetos.filter(o=>!o.isStatic)];
   for (const b of alvos){
@@ -376,7 +559,7 @@ function explodir(x, y, forca=17, raio=280){
       const f = forca*(1-d/raio)+3, a = Math.atan2(dy,dx);
       Body.setVelocity(b, { x:b.velocity.x+Math.cos(a)*f, y:b.velocity.y+Math.sin(a)*f-3 });
       Body.setAngularVelocity(b, b.angularVelocity + (Math.random()-0.5)*0.45);
-      if (b.label==='tnt' && b.plugin.desenho) b.plugin.desenho.explodeEm = performance.now()+140; // corrente!
+      if (b.label==='tnt' && b.plugin.desenho) b.plugin.desenho.explodeEm = performance.now()+140;
     }
   }
   for (let i=0;i<46;i++){ const a=Math.random()*Math.PI*2, v=2+Math.random()*9;
@@ -384,38 +567,13 @@ function explodir(x, y, forca=17, raio=280){
       cor:['#ffb300','#ff5722','#ffee58','#9e9e9e'][i%4], t:3+Math.random()*6 }); }
   tremida = 14; tocarSom('boom');
 }
-let audioCtx = null;
-function tocarSom(tipo){
-  if (!somLigado) return;
-  try{
-    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
-    if (audioCtx.state==='suspended') audioCtx.resume();
-    const t = audioCtx.currentTime;
-    if (tipo==='boom'){
-      const buf = audioCtx.createBuffer(1, audioCtx.sampleRate*0.5, audioCtx.sampleRate);
-      const d = buf.getChannelData(0); for (let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length);
-      const src = audioCtx.createBufferSource(); src.buffer=buf;
-      const f = audioCtx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=420;
-      const g = audioCtx.createGain(); g.gain.setValueAtTime(0.9,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.5);
-      src.connect(f); f.connect(g); g.connect(audioCtx.destination); src.start();
-    } else { // pop / tudum
-      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-      o.type='sine'; const f0 = tipo==='pop'?520:130;
-      o.frequency.setValueAtTime(f0,t); o.frequency.exponentialRampToValueAtTime(f0*0.45,t+0.12);
-      g.gain.setValueAtTime(tipo==='pop'?0.18:0.3,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.14);
-      o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(t+0.15);
-    }
-  }catch(e){ /* sem audio, sem problema */ }
-}
-Events.on(engine, 'collisionStart', ev => { // "tudum" nas batidas fortes
+Events.on(engine, 'collisionStart', ev => {
   const agora = performance.now(); if (agora - ultimoTudum < 130) return;
-  for (const par of ev.pairs){
-    const v = Math.max(par.bodyA.speed, par.bodyB.speed);
-    if (v > 7){ ultimoTudum = agora; tocarSom('tudum'); break; }
-  }
+  for (const par of ev.pairs)
+    if (Math.max(par.bodyA.speed, par.bodyB.speed) > 7){ ultimoTudum = agora; tocarSom('tudum'); break; }
 });
 
-/* ---------------- fundos (pre-desenhados) ---------------- */
+/* ---------------- fundos ---------------- */
 const imgFoto = new Image(); imgFoto.src = 'assets/foto-original.png';
 function pintarFundo(){
   fundoCanvas = document.createElement('canvas');
@@ -457,11 +615,11 @@ function pintarFundo(){
     ceu('#ffffff','#dfe3e6');
     g.fillStyle='#cdd3d8'; g.fillRect(0,chaoY,L,A-chaoY);
     g.fillStyle='rgba(0,0,0,.10)'; g.beginPath(); g.ellipse(L/2,chaoY+16,L*0.32,15,0,0,7); g.fill();
-  } else { // quadra (parecida com a foto!)
+  } else { // quadra
     ceu('#b9b1a1','#a89f8e');
     for (let i=0;i<L/3;i++){ g.fillStyle=`rgba(60,55,45,${rnd()*0.13})`;
       g.fillRect(rnd()*L, rnd()*chaoY*0.55, 5+rnd()*22, 4+rnd()*12); }
-    g.fillStyle='#e8a33d'; g.fillRect(L*0.42, 0, 64, chaoY*0.55); // pilar amarelo rs
+    g.fillStyle='#e8a33d'; g.fillRect(L*0.42, 0, 64, chaoY*0.55);
     g.fillStyle='#1c4f9c'; g.fillRect(0, chaoY*0.55, L, chaoY*0.45);
     g.fillStyle='rgba(255,255,255,.25)'; g.fillRect(0, chaoY*0.72, L, 3); g.fillRect(0, chaoY*0.9, L, 3);
     g.fillStyle='#7f95a8'; g.fillRect(0,chaoY,L,A-chaoY);
@@ -470,8 +628,267 @@ function pintarFundo(){
   }
 }
 
+/* ---------------- sombras ---------------- */
+const imagens = {}, silhuetas = {};
+function criarSilhueta(img){
+  const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
+  const g = c.getContext('2d'); g.drawImage(img,0,0);
+  g.globalCompositeOperation = 'source-in'; g.fillStyle = '#000'; g.fillRect(0,0,c.width,c.height);
+  return c;
+}
+function superficieAbaixo(x, y){ // chao ou topo da plataforma/trampolim mais proximo abaixo
+  let sup = chaoY + 2;
+  for (const b of objetos){
+    if (!b.isStatic) continue;
+    if (x >= b.bounds.min.x && x <= b.bounds.max.x && b.bounds.min.y > y - 12 && b.bounds.min.y < sup)
+      sup = b.bounds.min.y;
+  }
+  return sup;
+}
+function desenharSombraProjetada(x, y, angulo, img, w, h){
+  const sup = superficieAbaixo(x, y);
+  const altura = Math.max(0, sup - y);
+  const alpha = Math.max(0.06, 0.36 - altura*0.00045);
+  ctx.save(); ctx.globalAlpha = alpha;
+  ctx.translate(x + altura*0.22, sup + 7);       // luz vem do alto/esquerda
+  ctx.rotate(angulo); ctx.scale(1, 0.30);        // achata no chao
+  ctx.drawImage(img, -w/2, -h/2, w, h);
+  ctx.restore();
+}
+function desenharSombraElipse(x, y, largura){
+  const sup = superficieAbaixo(x, y);
+  const altura = Math.max(0, sup - y);
+  ctx.save(); ctx.globalAlpha = Math.max(0.06, 0.32 - altura*0.00045);
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.ellipse(x + altura*0.22, sup + 7, largura/2, 8, 0, 0, 7); ctx.fill();
+  ctx.restore();
+}
+function desenharSombras(){
+  if (!sombrasLigadas) return;
+  for (const b of objetos){ // plataformas projetam no chaozão
+    const d = b.plugin.desenho; if (!d) continue;
+    if (b.isStatic && (d.tipo==='plataforma' || d.tipo==='trampolim')){
+      const altura = Math.max(0, chaoY - b.position.y);
+      ctx.save(); ctx.globalAlpha = 0.20; ctx.fillStyle = '#000';
+      ctx.translate(b.position.x + altura*0.22, chaoY + 9); ctx.rotate(b.angle); ctx.scale(1, 0.35);
+      ctx.fillRect(-d.w/2, -d.h/2, d.w, d.h); ctx.restore();
+    } else if (!b.isStatic){
+      desenharSombraElipse(b.position.x, b.position.y, (d.r? d.r*2 : d.t || 44));
+    }
+  }
+  if (craque) for (const nome of window.ORDEM_DESENHO){
+    const b = craque.corpos[nome], d = PECAS_DADOS[nome], s = silhuetas[nome];
+    if (s) desenharSombraProjetada(b.position.x, b.position.y, b.angle, s, d.bbox[2]*escala, d.bbox[3]*escala);
+  }
+}
+
+/* =====================================================================
+   MODO TWEEENSLOP — tweening com keyframes + easing (graphs do Alight),
+   bounce no beat, squash & stretch, trilhas, zoom punch e moldura 9:16
+   ===================================================================== */
+const EASE = {
+  linear:  t => t,
+  inOut:   t => t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2,
+  slop:    t => t*t*t,                                        // segura… e SOLTA
+  outBack: t => { const c=1.70158; return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2); },
+  outElastic: t => (t===0||t===1) ? t : Math.pow(2,-10*t)*Math.sin((t*10-0.75)*(2*Math.PI/3))+1,
+  outBounce: t => { const n=7.5625, d=2.75;
+    if (t<1/d) return n*t*t; if (t<2/d) return n*(t-=1.5/d)*t+0.75;
+    if (t<2.5/d) return n*(t-=2.25/d)*t+0.9375; return n*(t-=2.625/d)*t+0.984375; },
+};
+function espelharPose(pose){ // troca esquerda<->direita negando os angulos
+  const troca = { bracoE:'bracoD', bracoD:'bracoE', anteE:'anteD', anteD:'anteE',
+    coxaE:'coxaD', coxaD:'coxaE', canelaE:'canelaD', canelaD:'canelaE', peE:'peD', peD:'peE' };
+  const r = {};
+  for (const n of FK_ORDEM) r[n] = -((pose[troca[n] || n]) || 0);
+  r.maoD = -((pose.anteE || 0) + 20);
+  return r;
+}
+const seg = (pose, beats, ease, ar=0) => ({ pose, beats, ease, ar });
+const ANIMS = {
+  dancinha: [ seg(POSES.dancando,1,'outBack'), seg(espelharPose(POSES.dancando),1,'outBack'),
+              seg(POSES.emPe,0.5,'outBounce'), seg(POSES.comemorando,0.5,'outElastic',70),
+              seg(POSES.dancando,1,'slop'), seg(espelharPose(POSES.dancando),1,'slop') ],
+  gol:      [ seg(POSES.correndo,1,'inOut'), seg(POSES.correndo,0.5,'linear'),
+              seg(POSES.chute,0.5,'slop',30), seg(POSES.comemorando,1.5,'outElastic',110),
+              seg(POSES.emPe,0.5,'outBounce') ],
+  phonk:    [ seg(POSES.emPe,0.5,'outBack'), seg(POSES.espacate,0.5,'slop'),
+              seg(POSES.voando,0.5,'inOut',140), seg(POSES.chute,0.5,'outElastic',60),
+              seg(POSES.dancando,0.5,'outBack'), seg(espelharPose(POSES.dancando),0.5,'outBack'),
+              seg(POSES.comemorando,1,'outBounce',90) ],
+  aleatorio: [], // preenchido no iniciar (embaralhado)
+};
+let tweenTempo = 0, bpm = 132, tween12fps = true, trilhas = true, beatSom = true;
+let zoomPunch = 0, squashX = 1, squashY = 1;
+let ultimaColcheia = -1, ultimoBeatTween = -1, tempoFantasma = 0;
+let fantasmas = []; // [{map:{nome:{x,y,a}}, nasc}]
+
+function quadroTikTok(){
+  let fh = Math.max(320, A - 92), fw = fh * 9/16;
+  if (fw > L - 12){ fw = L - 12; fh = fw * 16/9; }
+  return { x:(L-fw)/2, y: 82 + Math.max(0,(A-92-fh)/2), w:fw, h:fh };
+}
+function interpolarPose(pa, pb, t){
+  const r = {};
+  for (const n of FK_ORDEM){ const a = pa[n]||0, b = pb[n]||0; r[n] = a + envolverGraus(b-a)*t; }
+  return r;
+}
+function atualizarTween(dt){
+  if (!craque) return;
+  tweenTempo += dt/1000 * (lento ? 0.5 : 1);
+  const tempoPose = tween12fps ? Math.floor(tweenTempo*12)/12 : tweenTempo; // 12 FPS slop!
+  const beatDur = 60/bpm;
+  const segs = ANIMS[$('selAnim').value] || ANIMS.dancinha;
+  const total = segs.reduce((s,k)=>s+k.beats,0);
+  let tb = (tempoPose/beatDur) % total;
+  let i = 0; while (tb > segs[i].beats){ tb -= segs[i].beats; i++; }
+  const atual = segs[i], anterior = segs[(i-1+segs.length)%segs.length];
+  const t = EASE[atual.ease](Math.min(1, tb/atual.beats));
+  const ang = interpolarPose(anterior.pose, atual.pose, t);
+  const ar = (anterior.ar||0) + ((atual.ar||0)-(anterior.ar||0))*t;
+  const f = quadroTikTok(), cx = f.x + f.w/2;
+  const quique = Math.abs(Math.sin((tempoPose/beatDur)*Math.PI)) * 16;
+  const balanco = Math.sin((tempoPose/beatDur)*Math.PI) * 14;
+  posicionarCraque(ang, { x: cx, y: chaoY - 320 });
+  // apoia os pes no chao (ou flutua no "ar" do keyframe), centralizado no quadro
+  let minX=1e9, maxX=-1e9, maxY=-1e9;
+  for (const n of FK_ORDEM){ const bd = craque.corpos[n].bounds;
+    minX=Math.min(minX,bd.min.x); maxX=Math.max(maxX,bd.max.x); maxY=Math.max(maxY,bd.max.y); }
+  const dx = cx + balanco - (minX+maxX)/2, dy = (chaoY - quique - ar) - maxY;
+  for (const n of FK_ORDEM){ const b = craque.corpos[n];
+    Body.setPosition(b, { x:b.position.x+dx, y:b.position.y+dy }); }
+  definirPoseAlvo(ang);
+  // squash & stretch no impacto do beat
+  const faseBeat = (tweenTempo/beatDur) % 1;
+  const impacto = Math.exp(-faseBeat*5) * 0.13;
+  squashX = 1 + impacto; squashY = 1 - impacto;
+  // eventos do beat: som, zoom, brilhos
+  const colcheia = Math.floor(tweenTempo/(beatDur/2));
+  if (colcheia !== ultimaColcheia){ ultimaColcheia = colcheia; tocarColcheia(colcheia); }
+  const beat = Math.floor(tweenTempo/beatDur);
+  if (beat !== ultimoBeatTween){
+    ultimoBeatTween = beat; zoomPunch = 1;
+    const cab = craque.corpos.cabeca.position;
+    for (let k=0;k<5;k++) particulas.push({ x:cab.x+(Math.random()-0.5)*170, y:cab.y+(Math.random()-0.5)*120,
+      vx:(Math.random()-0.5)*1.5, vy:-1-Math.random()*1.5, vida:1, emoji:['✨','🔥','⭐','💥'][k%4], t:17 });
+  }
+  // trilhas (motion blur dos edits)
+  tempoFantasma += dt;
+  if (trilhas && tempoFantasma > 85){
+    tempoFantasma = 0;
+    const map = {};
+    for (const n of FK_ORDEM){ const b = craque.corpos[n]; map[n] = { x:b.position.x, y:b.position.y, a:b.angle }; }
+    fantasmas.push({ map, nasc: performance.now() });
+    if (fantasmas.length > 4) fantasmas.shift();
+  }
+}
+function desenharFantasmas(){
+  const agora = performance.now();
+  fantasmas = fantasmas.filter(g => agora - g.nasc < 380);
+  for (const g of fantasmas){
+    ctx.globalAlpha = 0.16 * (1 - (agora-g.nasc)/380);
+    for (const nome of window.ORDEM_DESENHO){
+      const p = g.map[nome], d = PECAS_DADOS[nome], img = imagens[nome]; if (!img || !p) continue;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a);
+      ctx.drawImage(img, -d.bbox[2]*escala/2, -d.bbox[3]*escala/2, d.bbox[2]*escala, d.bbox[3]*escala);
+      ctx.restore();
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+function desenharMolduraTikTok(){
+  const f = quadroTikTok();
+  ctx.save();
+  ctx.beginPath(); ctx.rect(0,0,L,A); ctx.rect(f.x,f.y,f.w,f.h);
+  ctx.fillStyle = 'rgba(0,0,0,0.48)'; ctx.fill('evenodd');       // escurece fora do 9:16
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = '#25F4EE'; ctx.strokeRect(f.x-2, f.y-2, f.w, f.h);
+  ctx.strokeStyle = '#FE2C55'; ctx.strokeRect(f.x+2, f.y+2, f.w, f.h);
+  ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 1.5; ctx.strokeRect(f.x, f.y, f.w, f.h);
+  const u = f.w/360; // escala da interface fake
+  ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+  ctx.font = `600 ${15*u}px Arial`;
+  ctx.fillText('Seguindo    ', f.x+f.w/2-42*u, f.y+30*u);
+  ctx.font = `800 ${15*u}px Arial`; ctx.fillText('Para você', f.x+f.w/2+48*u, f.y+30*u);
+  // botoes da direita
+  const botoes = [['❤️','1,2 mi'],['💬','48,3 mil'],['🔖','Salvar'],['↗️','9.871']];
+  botoes.forEach(([e,txt],i)=>{
+    const y = f.y + f.h*0.52 + i*62*u;
+    ctx.font = `${30*u}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+    ctx.fillText(e, f.x+f.w-28*u, y);
+    ctx.font = `700 ${11*u}px Arial`; ctx.fillText(txt, f.x+f.w-28*u, y+20*u);
+  });
+  // disco girando
+  ctx.save(); ctx.translate(f.x+f.w-28*u, f.y+f.h-34*u); ctx.rotate(tweenTempo*2.4);
+  ctx.font = `${30*u}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+  ctx.fillText('💿',0,0); ctx.restore();
+  // usuario + hashtags
+  ctx.textAlign = 'left';
+  ctx.font = `800 ${15*u}px Arial`; ctx.fillText('@craque.camisa1', f.x+12*u, f.y+f.h-52*u);
+  ctx.font = `600 ${12.5*u}px Arial`;
+  ctx.fillText('#tweenslop #futebol #ragdoll #phonk 🇧🇷', f.x+12*u, f.y+f.h-32*u);
+  ctx.fillText('🎵 som original · phonk do craque', f.x+12*u, f.y+f.h-13*u);
+  // texto gigante quicando no beat
+  const txt = ($('txtTween').value || '🔥').toUpperCase();
+  ctx.save();
+  ctx.translate(f.x+f.w/2, f.y+f.h*0.17); ctx.scale(1+0.10*zoomPunch, 1+0.10*zoomPunch);
+  ctx.font = `900 ${Math.max(20, f.w*0.085)}px Impact, "Arial Black", sans-serif`;
+  ctx.textAlign = 'center'; ctx.lineWidth = 7*u; ctx.strokeStyle = '#000'; ctx.fillStyle = '#fff';
+  ctx.strokeText(txt, 0, 0); ctx.fillText(txt, 0, 0);
+  ctx.restore();
+  if (gravando){
+    ctx.fillStyle = '#FE2C55'; ctx.beginPath(); ctx.arc(f.x+20*u, f.y+24*u, 7*u, 0, 7); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = `800 ${14*u}px Arial`; ctx.textAlign = 'left';
+    const s = Math.floor((performance.now()-recInicio)/1000);
+    ctx.fillText(`REC 0:${String(s).padStart(2,'0')}`, f.x+34*u, f.y+29*u);
+  }
+  ctx.restore();
+}
+
+/* ---------------- gravador de TikTok (video 9:16 com o beat!) ---------------- */
+let gravando = false, recorder = null, recChunks = [], recInicio = 0, recExt = 'webm';
+const recCanvas = document.createElement('canvas'); recCanvas.width = 720; recCanvas.height = 1280;
+function alternarGravacao(){
+  if (gravando){ recorder.stop(); return; }
+  if (!window.MediaRecorder){ $('recStatus').textContent = '😢 Seu navegador não grava vídeo. Tenta no Chrome!'; return; }
+  if (!tweenModo) alternarTween(true);
+  ensureAudio();
+  const streamVideo = recCanvas.captureStream(30);
+  const trilhasStream = [...streamVideo.getVideoTracks()];
+  if (audioStreamDest) trilhasStream.push(...audioStreamDest.stream.getAudioTracks());
+  const mime = ['video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm']
+    .find(m => { try{ return MediaRecorder.isTypeSupported(m); }catch(e){ return false; } });
+  recExt = mime && mime.includes('mp4') ? 'mp4' : 'webm';
+  try{
+    recorder = new MediaRecorder(new MediaStream(trilhasStream),
+      mime ? { mimeType: mime, videoBitsPerSecond: 8_000_000 } : undefined);
+  }catch(e){ $('recStatus').textContent = '😢 Não rolou gravar nesse navegador.'; return; }
+  recChunks = [];
+  recorder.ondataavailable = e => { if (e.data.size) recChunks.push(e.data); };
+  recorder.onstop = () => {
+    gravando = false; $('btnGravar').classList.remove('gravando');
+    $('btnGravar').textContent = '⏺️ Gravar TikTok (até 15s)';
+    const blob = new Blob(recChunks, { type: recorder.mimeType || 'video/webm' });
+    const a = document.createElement('a');
+    a.download = `tweenslop-do-craque.${recExt}`; a.href = URL.createObjectURL(blob); a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+    $('recStatus').textContent = `✅ Vídeo baixado (${recExt.toUpperCase()})! Agora é só postar 🔥`;
+  };
+  recorder.start(250);
+  gravando = true; recInicio = performance.now();
+  $('btnGravar').classList.add('gravando'); $('btnGravar').textContent = '⏹️ Parar e baixar';
+  $('recStatus').textContent = '🔴 Gravando o 9:16 com o beat… (para sozinho em 15s)';
+}
+function passoGravacao(){
+  if (!gravando) return;
+  if (performance.now() - recInicio > 15000){ recorder.stop(); return; }
+  const g = recCanvas.getContext('2d');
+  const f = quadroTikTok();
+  g.filter = $('selFiltro').value || 'none';
+  g.drawImage(tela, f.x*DPR, f.y*DPR, f.w*DPR, f.h*DPR, 0, 0, 720, 1280);
+}
+
 /* ---------------- desenho ---------------- */
-const imagens = {};
 function desenharEmoji(x,y,angulo,emoji,tam){
   ctx.save(); ctx.translate(x,y); ctx.rotate(angulo);
   ctx.font = `${tam}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
@@ -479,10 +896,15 @@ function desenharEmoji(x,y,angulo,emoji,tam){
 }
 function desenhar(){
   ctx.setTransform(DPR,0,0,DPR,0,0);
+  if (tweenModo && zoomPunch > 0.01){ // zoom punch no beat (a camera inteira!)
+    const f = quadroTikTok(), cx = f.x+f.w/2, cy = f.y+f.h/2;
+    ctx.translate(cx,cy); ctx.scale(1+0.07*zoomPunch, 1+0.07*zoomPunch); ctx.translate(-cx,-cy);
+  }
   if (tremida>0){ ctx.translate((Math.random()-0.5)*tremida,(Math.random()-0.5)*tremida); tremida*=0.86; }
   if (fundoCanvas) ctx.drawImage(fundoCanvas,0,0,L,A);
 
-  /* objetos */
+  desenharSombras();
+
   for (const b of objetos){
     const d = b.plugin.desenho, {x,y} = b.position, a = b.angle;
     if (!d) continue;
@@ -521,112 +943,144 @@ function desenhar(){
       ctx.fillStyle='#1565c0'; ctx.fillRect(-d.w/2+14,-d.h/2,d.w-28,d.h); ctx.restore();
     }
   }
-  /* linha da rampa sendo desenhada */
   if (rampaInicio && ponteiro.ativo){
     ctx.strokeStyle='#7dffb0'; ctx.lineWidth=5; ctx.setLineDash([9,6]);
     ctx.beginPath(); ctx.moveTo(rampaInicio.x,rampaInicio.y); ctx.lineTo(ponteiro.x,ponteiro.y); ctx.stroke();
     ctx.setLineDash([]);
   }
 
-  /* o craque (pecas na ordem certa) */
+  /* o craque */
   if (craque){
+    ctx.save();
+    if (tweenModo){ const p = craque.corpos.peito.position; // squash & stretch
+      ctx.translate(p.x,p.y); ctx.scale(squashX,squashY); ctx.translate(-p.x,-p.y);
+      if (trilhas) desenharFantasmas();
+    }
     for (const nome of window.ORDEM_DESENHO){
       const b = craque.corpos[nome], d = PECAS_DADOS[nome], img = imagens[nome];
       if (!img) continue;
+      const w = d.bbox[2]*escala, h = d.bbox[3]*escala;
+      if (sombrasLigadas && silhuetas[nome]){ // sombrinha de contato (profundidade)
+        ctx.save(); ctx.globalAlpha = 0.20;
+        ctx.translate(b.position.x+5, b.position.y+7); ctx.rotate(b.angle);
+        ctx.drawImage(silhuetas[nome], -w/2, -h/2, w, h); ctx.restore();
+      }
       ctx.save(); ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle);
-      ctx.drawImage(img, -d.bbox[2]*escala/2, -d.bbox[3]*escala/2, d.bbox[2]*escala, d.bbox[3]*escala);
-      if (chuteiras && PE[nome]){
+      ctx.drawImage(img, -w/2, -h/2, w, h);
+      if (chuteiras && CHUTEIRA_EM[nome]){
+        const c = centroP(nome), pt = CHUTEIRA_EM[nome];
         ctx.font = `${Math.round(96*escala)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
         ctx.textAlign='center'; ctx.textBaseline='middle';
-        ctx.fillText('👟', PE[nome][0]*escala, PE[nome][1]*escala + 14*escala);
+        ctx.fillText('👟', (pt[0]-c[0])*escala, (pt[1]-c[1])*escala + 12*escala);
       }
       ctx.restore();
     }
-    if (poseModo){ // bolinhas nas juntas
+    ctx.restore();
+    if (poseModo){
       for (const nome of FK_ORDEM.slice(1)){
-        const p = fotoParaMundo(MAE[nome], pivot(nome));
+        const p = juntaMundo(MAE[nome], nome);
         ctx.fillStyle='#19a35b'; ctx.strokeStyle='#fff'; ctx.lineWidth=2.5;
         ctx.beginPath(); ctx.arc(p.x,p.y,8,0,7); ctx.fill(); ctx.stroke();
       }
-      ctx.fillStyle='rgba(8,20,12,.85)'; ctx.fillRect(L/2-265, 104, 530, 30);
-      ctx.fillStyle='#b9ffd2'; ctx.font='700 14px Arial'; ctx.textAlign='center';
-      ctx.fillText('🧍 MODO POSE: arrasta um braço/perna pra girar • o tronco (ou o céu) pra mover ele', L/2, 124);
+      ctx.fillStyle='rgba(8,20,12,.85)';
+      const tw = Math.min(660, L-16); ctx.fillRect(L/2-tw/2, 104, tw, 30);
+      ctx.fillStyle='#b9ffd2'; ctx.font='700 12.5px Arial'; ctx.textAlign='center';
+      ctx.fillText('🧍 MODO POSE: arrasta um membro pra girar na junta • o peito (ou o céu) pra mover ele', L/2, 124);
     }
   }
 
-  /* particulas */
-  for (const p of particulas){ ctx.globalAlpha = Math.max(0,p.vida);
-    ctx.fillStyle=p.cor; ctx.fillRect(p.x-p.t/2,p.y-p.t/2,p.t,p.t); }
+  for (const p of particulas){
+    ctx.globalAlpha = Math.max(0,p.vida);
+    if (p.emoji){ ctx.font = `${p.t}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+      ctx.textAlign='center'; ctx.fillText(p.emoji, p.x, p.y); }
+    else { ctx.fillStyle=p.cor; ctx.fillRect(p.x-p.t/2,p.y-p.t/2,p.t,p.t); }
+  }
   ctx.globalAlpha = 1;
 
-  /* texto meme (preview ao vivo) */
-  const tc = document.getElementById('txtCima').value.trim(), tb = document.getElementById('txtBaixo').value.trim();
+  const tc = $('txtCima').value.trim(), tb = $('txtBaixo').value.trim();
   const meme = (txt,y)=>{ if(!txt) return;
     ctx.font = `900 ${Math.max(24, L*0.042)}px Impact, "Arial Black", sans-serif`;
     ctx.textAlign='center'; ctx.lineWidth=8; ctx.strokeStyle='#000'; ctx.fillStyle='#fff';
     ctx.strokeText(txt.toUpperCase(), L/2, y); ctx.fillText(txt.toUpperCase(), L/2, y); };
   meme(tc, 150); meme(tb, A-92);
+
+  if (tweenModo) desenharMolduraTikTok();
+  zoomPunch *= 0.88;
 }
 
-/* ---------------- loop principal ---------------- */
+/* ---------------- loop ---------------- */
 let ultimo = performance.now(), acum = 0;
+const PASSO = 1000/120; // fisica a 120Hz = juntas firmes, sem atravessar parede
 function loop(agora){
   requestAnimationFrame(loop);
   const dt = Math.min(50, agora-ultimo); ultimo = agora;
-  if (!pausado && !poseModo){
+  if (agarrado){ // a mao segue o ponteiro suavemente (sem teletransporte)
+    const alvo = { x:ponteiro.x, y:ponteiro.y }, p = agarrado.pointA;
+    const dx = alvo.x-p.x, dy = alvo.y-p.y, d = Math.hypot(dx,dy), max = 55;
+    agarrado.pointA = d > max ? { x:p.x+dx/d*max, y:p.y+dy/d*max } : alvo;
+    agarrado.bodyB && Body.setAngularVelocity(agarrado.bodyB, agarrado.bodyB.angularVelocity*0.94);
+  }
+  if (!pausado && !poseModo && !tweenModo){
     acum += dt * (lento ? 0.32 : 1);
     let passos = 0;
-    while (acum >= 16.666 && passos < 3){ Engine.update(engine, 16.666); acum -= 16.666; passos++; }
-    if (passos===3) acum = 0;
+    while (acum >= PASSO && passos < 6){
+      Engine.update(engine, PASSO); aplicarTonusELimites();
+      acum -= PASSO; passos++;
+    }
+    if (passos===6) acum = 0;
   }
-  /* TNTs com pavio aceso */
+  if (tweenModo && !pausado) atualizarTween(dt);
   for (const b of [...objetos]){
     const d = b.plugin.desenho;
     if (d && d.tipo==='tnt' && agora >= d.explodeEm){
       const {x,y} = b.position; removerObjeto(b); explodir(x,y,19,300);
     }
   }
-  /* particulas */
-  for (const p of particulas){ p.x+=p.vx; p.y+=p.vy; p.vy+=0.25; p.vida-=0.022; }
+  for (const p of particulas){ p.x+=p.vx; p.y+=p.vy; p.vy += p.emoji ? -0.015 : 0.25; p.vida-=0.022; }
   particulas = particulas.filter(p=>p.vida>0);
   desenhar();
+  passoGravacao();
 }
 
-/* ---------------- interacao (mouse + toque) ---------------- */
+/* ---------------- interacao ---------------- */
 const ponteiro = { x:0, y:0, ativo:false };
-let agarrado = null;             // constraint da mao (fisica)
-let arrastoPose = null;          // {tipo:'girar'|'mover'|'objeto', ...}
-let rampaInicio = null;
+let agarrado = null, arrastoPose = null, rampaInicio = null;
 
 function pecaNoPonto(p){
   if (!craque) return null;
   const achados = Query.point(Object.values(craque.corpos), p);
   if (!achados.length) return null;
-  // a que esta mais "na frente" no desenho ganha
-  achados.sort((a,b2)=> window.ORDEM_DESENHO.indexOf(a.label.slice(5)) - window.ORDEM_DESENHO.indexOf(b2.label.slice(5)));
+  achados.sort((a,b2)=> window.ORDEM_DESENHO.indexOf(a.label.slice(5)) -
+                        window.ORDEM_DESENHO.indexOf(b2.label.slice(5)));
   return achados[achados.length-1].label.slice(5);
 }
 function objetoNoPonto(p){ const a = Query.point(objetos, p); return a.length ? a[a.length-1] : null; }
 
 tela.addEventListener('pointerdown', ev => {
+  ensureAudio();
   tela.setPointerCapture(ev.pointerId);
   ponteiro.x = ev.clientX; ponteiro.y = ev.clientY; ponteiro.ativo = true;
   const p = { x:ponteiro.x, y:ponteiro.y };
 
-  if (poseModo){ // ---- MODO POSE: girar membro / mover ele / mover objeto
+  if (tweenModo){ // no tween, clique = chuva de brilhos ✨
+    for (let k=0;k<7;k++) particulas.push({ x:p.x+(Math.random()-0.5)*60, y:p.y+(Math.random()-0.5)*60,
+      vx:(Math.random()-0.5)*2, vy:-1-Math.random()*2, vida:1, emoji:['✨','🔥','💥','⭐'][k%4], t:18 });
+    return;
+  }
+  if (poseModo){
     const obj = objetoNoPonto(p);
     const nome = obj ? null : pecaNoPonto(p);
     if (obj){ arrastoPose = { tipo:'objeto', body:obj, dx:obj.position.x-p.x, dy:obj.position.y-p.y }; }
-    else if (nome && nome!=='tronco'){
-      const junta = fotoParaMundo(MAE[nome], pivot(nome));
+    else if (nome && nome!=='peito'){
+      const junta = juntaMundo(MAE[nome], nome);
       const ini = {}; for (const n of descendentes(nome)){ const b=craque.corpos[n];
         ini[n] = { x:b.position.x, y:b.position.y, a:b.angle }; }
-      arrastoPose = { tipo:'girar', junta, ini, angIni: Math.atan2(p.y-junta.y, p.x-junta.x),
-                      membros: descendentes(nome) };
-    } else if (craque){ arrastoPose = { tipo:'mover', ini:{...p} }; } // tronco ou céu = mover ele todo
+      arrastoPose = { tipo:'girar', junta, ini, membros: descendentes(nome),
+                      angIni: Math.atan2(p.y-junta.y, p.x-junta.x) };
+    } else if (craque){ arrastoPose = { tipo:'mover', ini:{...p} }; }
     return;
   }
-  switch (ferramenta){ // ---- ferramentas na fisica
+  switch (ferramenta){
     case 'bola': soltarBola(p.x,p.y); break;
     case 'caixa': soltarCaixa(p.x,p.y); break;
     case 'bloco': soltarBloco(p.x,p.y); break;
@@ -635,13 +1089,13 @@ tela.addEventListener('pointerdown', ev => {
     case 'trampolim': colocarTrampolim(p.x,p.y); tocarSom('pop'); break;
     case 'plataforma': rampaInicio = p; break;
     case 'apagar': { const o = objetoNoPonto(p); if (o){ removerObjeto(o); tocarSom('pop'); } break; }
-    default: { // mao: agarra qualquer corpo e joga!
+    default: {
       const alvos = [...(craque?Object.values(craque.corpos):[]), ...objetos.filter(o=>!o.isStatic)];
       const achados = Query.point(alvos, p);
       if (achados.length){
         const b = achados[achados.length-1];
-        const local = rot({ x:p.x-b.position.x, y:p.y-b.position.y }, -b.angle*180/Math.PI);
-        agarrado = Constraint.create({ pointA:p, bodyB:b, pointB:local, stiffness:0.14, damping:0.08, length:0 });
+        const local = rot({ x:p.x-b.position.x, y:p.y-b.position.y }, -graus(b.angle));
+        agarrado = Constraint.create({ pointA:p, bodyB:b, pointB:local, stiffness:0.18, damping:0.08, length:0 });
         Composite.add(engine.world, agarrado); tocarSom('pop');
       }
     }
@@ -650,24 +1104,25 @@ tela.addEventListener('pointerdown', ev => {
 tela.addEventListener('pointermove', ev => {
   ponteiro.x = ev.clientX; ponteiro.y = ev.clientY;
   const p = { x:ponteiro.x, y:ponteiro.y };
-  if (agarrado) agarrado.pointA = p;
   if (arrastoPose && craque){
     if (arrastoPose.tipo==='objeto'){
       Body.setPosition(arrastoPose.body, { x:p.x+arrastoPose.dx, y:p.y+arrastoPose.dy });
     } else if (arrastoPose.tipo==='mover'){
       const dx = p.x-arrastoPose.ini.x, dy = p.y-arrastoPose.ini.y; arrastoPose.ini = {...p};
       for (const n in craque.corpos){ const b=craque.corpos[n];
-        Body.setPosition(b, { x:b.position.x+dx, y:b.position.y+dy });
-        Body.setVelocity(b,{x:0,y:0}); }
+        Body.setPosition(b, { x:b.position.x+dx, y:b.position.y+dy }); Body.setVelocity(b,{x:0,y:0}); }
     } else if (arrastoPose.tipo==='girar'){
       const delta = Math.atan2(p.y-arrastoPose.junta.y, p.x-arrastoPose.junta.x) - arrastoPose.angIni;
       for (const n of arrastoPose.membros){
         const b = craque.corpos[n], ini = arrastoPose.ini[n];
-        const r = rot({ x:ini.x-arrastoPose.junta.x, y:ini.y-arrastoPose.junta.y }, delta*180/Math.PI);
+        const r = rot({ x:ini.x-arrastoPose.junta.x, y:ini.y-arrastoPose.junta.y }, graus(delta));
         Body.setPosition(b, { x:arrastoPose.junta.x+r.x, y:arrastoPose.junta.y+r.y });
         Body.setAngle(b, ini.a + delta);
         Body.setVelocity(b,{x:0,y:0}); Body.setAngularVelocity(b,0);
       }
+      // a pose montada vira o alvo dos musculos
+      const ang = {}; for (const n of FK_ORDEM) ang[n] = graus(craque.corpos[n].angle);
+      definirPoseAlvo(ang);
     }
   }
 });
@@ -679,76 +1134,116 @@ function soltarPonteiro(){
 }
 tela.addEventListener('pointerup', soltarPonteiro);
 tela.addEventListener('pointercancel', soltarPonteiro);
-tela.addEventListener('contextmenu', ev => { // botao direito apaga objeto
+tela.addEventListener('contextmenu', ev => {
   ev.preventDefault(); const o = objetoNoPonto({x:ev.clientX,y:ev.clientY});
   if (o) removerObjeto(o);
 });
-tela.addEventListener('wheel', ev => { // rodinha gira o membro no modo pose
+tela.addEventListener('wheel', ev => {
   if (!poseModo || !craque) return;
   ev.preventDefault();
   const nome = pecaNoPonto({x:ev.clientX,y:ev.clientY});
-  if (!nome || nome==='tronco') return;
-  const junta = fotoParaMundo(MAE[nome], pivot(nome));
-  const delta = rad(ev.deltaY > 0 ? 6 : -6);
-  for (const n of descendentes(nome)){ const b=craque.corpos[n];
-    const r = rot({ x:b.position.x-junta.x, y:b.position.y-junta.y }, delta*180/Math.PI);
-    Body.setPosition(b,{ x:junta.x+r.x, y:junta.y+r.y }); Body.setAngle(b, b.angle+delta);
-    Body.setVelocity(b,{x:0,y:0}); Body.setAngularVelocity(b,0); }
+  if (!nome || nome==='peito') return;
+  const junta = juntaMundo(MAE[nome], nome), delta = rad(ev.deltaY > 0 ? 6 : -6);
+  for (const n of descendentes(nome)) girarCorpoAoRedor(craque.corpos[n], junta, delta);
+  const ang = {}; for (const n of FK_ORDEM){ const b=craque.corpos[n];
+    Body.setVelocity(b,{x:0,y:0}); Body.setAngularVelocity(b,0); ang[n]=graus(b.angle); }
+  definirPoseAlvo(ang);
 }, { passive:false });
-tela.addEventListener('dblclick', ev => { // clique duplo gira objeto no modo pose
+tela.addEventListener('dblclick', ev => {
   if (!poseModo) return;
   const o = objetoNoPonto({x:ev.clientX,y:ev.clientY});
   if (o) Body.setAngle(o, o.angle + rad(15));
 });
 
 /* ---------------- botoes / UI ---------------- */
-const $ = id => document.getElementById(id);
-function selecionarFerramenta(nome, botao){
+function selecionarFerramenta(nome){
   ferramenta = nome;
   document.querySelectorAll('.ferr').forEach(b=>b.classList.toggle('ativa', b.dataset.ferr===nome));
-  if (poseModo && nome!=='mao') alternarPose(false); // ferramenta de fisica sai do modo pose
+  if (poseModo && nome!=='mao') alternarPose(false);
+  if (tweenModo && nome!=='mao') alternarTween(false);
 }
 document.querySelectorAll('.ferr').forEach(b =>
-  b.addEventListener('click', ()=>selecionarFerramenta(b.dataset.ferr, b)));
+  b.addEventListener('click', ()=>selecionarFerramenta(b.dataset.ferr)));
 
 function alternarPose(force){
-  poseModo = force !== undefined ? force : !poseModo;
+  const novo = force !== undefined ? force : !poseModo;
+  if (novo && tweenModo) alternarTween(false);
+  poseModo = novo;
   $('btnPose').classList.toggle('ativo', poseModo);
   if (poseModo && craque) for (const n in craque.corpos){
     Body.setVelocity(craque.corpos[n],{x:0,y:0}); Body.setAngularVelocity(craque.corpos[n],0); }
   tocarSom('pop');
 }
-$('btnPose').addEventListener('click', ()=>alternarPose());
+$('btnPose').addEventListener('click', ()=>{ ensureAudio(); alternarPose(); });
+
+function alternarTween(force){
+  const novo = force !== undefined ? force : !tweenModo;
+  if (gravando && !novo) recorder.stop();
+  if (novo && poseModo){ poseModo = false; $('btnPose').classList.remove('ativo'); }
+  tweenModo = novo;
+  $('btnTween').classList.toggle('ativo', tweenModo);
+  $('dicaBarra').style.display = tweenModo ? 'none' : '';
+  if (tweenModo){
+    ensureAudio();
+    if (pausado) alternarPausa();
+    tweenTempo = 0; ultimaColcheia = -1; ultimoBeatTween = -1; fantasmas = [];
+    $('detTween').open = true;
+  } else squashX = squashY = 1;
+  tocarSom('pop');
+}
+$('btnTween').addEventListener('click', ()=>alternarTween());
+
 function alternarPausa(){ pausado = !pausado;
   $('btnPausar').textContent = pausado ? '▶️ Continuar' : '⏸️ Pausar';
   $('btnPausar').classList.toggle('ativo', pausado); }
 $('btnPausar').addEventListener('click', alternarPausa);
-$('btnReset').addEventListener('click', ()=>{ montarCraque(L/2, Math.min(300, A*0.35), POSES.emPe); tocarSom('pop'); });
+$('btnReset').addEventListener('click', ()=>{
+  if (tweenModo) alternarTween(false);
+  montarCraque(L/2, Math.min(300, A*0.35), POSES.emPe); tocarSom('pop'); });
 $('btnPulo').addEventListener('click', ()=>{
-  if (!craque) return;
+  if (!craque || tweenModo) return;
   for (const n in craque.corpos){ const b=craque.corpos[n];
     Body.setVelocity(b,{ x:b.velocity.x+(Math.random()-0.5)*4, y:-17-Math.random()*4 });
     Body.setAngularVelocity(b,(Math.random()-0.5)*0.35); }
   tocarSom('pop');
 });
-$('btnSom').addEventListener('click', ()=>{ somLigado=!somLigado;
+$('btnSom').addEventListener('click', ()=>{ somLigado=!somLigado; ensureAudio();
   $('btnSom').textContent = somLigado?'🔊 Som':'🔇 Mudo'; $('btnSom').classList.toggle('ativo',!somLigado); });
 $('btnLento').addEventListener('click', ()=>{ lento=!lento; $('btnLento').classList.toggle('ativo',lento); });
 $('btnLimpar').addEventListener('click', ()=>{ for (const o of [...objetos]) removerObjeto(o); });
 $('btnChuteira').addEventListener('click', ()=>{ chuteiras=!chuteiras;
   $('btnChuteira').classList.toggle('ativo', chuteiras); });
+$('btnSombras').addEventListener('click', ()=>{ sombrasLigadas=!sombrasLigadas;
+  $('btnSombras').classList.toggle('ativo', sombrasLigadas); });
+$('btnAutoColisao').addEventListener('click', ()=>{ autoColisao=!autoColisao;
+  $('btnAutoColisao').classList.toggle('ativo', autoColisao); atualizarFiltros(); tocarSom('pop'); });
+$('rngTonus').addEventListener('input', ev => { tonus = ev.target.value/100;
+  $('tonusVal').textContent = ev.target.value + '%'; });
+
+/* tweenslop: controles */
+$('rngBpm').addEventListener('input', ev => { bpm = +ev.target.value; $('bpmVal').textContent = bpm; });
+$('btn12fps').addEventListener('click', ()=>{ tween12fps=!tween12fps;
+  $('btn12fps').classList.toggle('ativo', tween12fps); });
+$('btnTrilhas').addEventListener('click', ()=>{ trilhas=!trilhas;
+  $('btnTrilhas').classList.toggle('ativo', trilhas); if(!trilhas) fantasmas=[]; });
+$('btnBeatSom').addEventListener('click', ()=>{ beatSom=!beatSom;
+  $('btnBeatSom').classList.toggle('ativo', beatSom); });
+$('selAnim').addEventListener('change', ()=>{ tweenTempo = 0; ultimaColcheia = -1; });
+$('btnGravar').addEventListener('click', alternarGravacao);
 
 document.querySelectorAll('#poses .btn').forEach(b =>
-  b.addEventListener('click', ()=>aplicarPose(POSES[b.dataset.pose])));
+  b.addEventListener('click', ()=>{ ensureAudio(); aplicarPose(POSES[b.dataset.pose]); }));
 document.querySelectorAll('#tamanhos .btn').forEach(b =>
   b.addEventListener('click', ()=>{
     document.querySelectorAll('#tamanhos .btn').forEach(x=>x.classList.remove('ativo'));
     b.classList.add('ativo'); escala = parseFloat(b.dataset.tam);
-    const t = craque?.corpos.tronco.position || {x:L/2,y:280};
+    const t = craque?.corpos.peito.position || {x:L/2,y:280};
+    if (tweenModo) alternarTween(false);
     montarCraque(t.x, t.y, POSES.emPe);
   }));
 document.querySelectorAll('#adesivos .btn').forEach(b =>
   b.addEventListener('click', ()=>{
+    ensureAudio();
     const t = craque?.corpos.cabeca.position || {x:L/2,y:150};
     soltarEmoji(t.x + (Math.random()-0.5)*120, Math.max(60, t.y-140), b.dataset.emoji);
     tocarSom('pop');
@@ -777,10 +1272,11 @@ addEventListener('keydown', ev => {
   if (TECLAS_FERR[ev.key]) selecionarFerramenta(TECLAS_FERR[ev.key]);
   else if (ev.key===' '){ ev.preventDefault(); alternarPausa(); }
   else if (ev.key.toLowerCase()==='p') alternarPose();
+  else if (ev.key.toLowerCase()==='t') alternarTween();
   else if (ev.key.toLowerCase()==='r') $('btnReset').click();
 });
 
-/* ---------------- redimensionar ---------------- */
+/* ---------------- redimensionar / inicio ---------------- */
 function ajustarTamanho(){
   L = innerWidth; A = innerHeight; DPR = Math.min(devicePixelRatio||1, 2);
   tela.width = L*DPR; tela.height = A*DPR;
@@ -790,17 +1286,22 @@ function ajustarTamanho(){
 let resizeTimer;
 addEventListener('resize', ()=>{ clearTimeout(resizeTimer); resizeTimer = setTimeout(ajustarTamanho, 150); });
 
-/* ---------------- inicio ---------------- */
 async function iniciar(){
   await Promise.all(Object.entries(PECAS_DADOS).map(([nome,d]) => new Promise(res => {
-    const img = new Image(); img.onload = ()=>{ imagens[nome]=img; res(); };
+    const img = new Image();
+    img.onload = ()=>{ imagens[nome]=img; silhuetas[nome]=criarSilhueta(img); res(); };
     img.onerror = ()=>res(); img.src = d.file;
   })));
   if (!imgFoto.complete) await new Promise(r=>{ imgFoto.onload=r; imgFoto.onerror=r; });
+  // animacao aleatoria: embaralha as poses com graphs variados
+  const nomes = Object.keys(POSES).sort(()=>Math.random()-0.5);
+  const graphs = ['outBack','outElastic','slop','outBounce','inOut'];
+  ANIMS.aleatorio = nomes.map((n,i)=> seg(POSES[n], i%3===0?1:0.5, graphs[i%graphs.length],
+    n==='voando' ? 130 : n==='comemorando' ? 80 : 0));
   ajustarTamanho();
   montarCraque(L/2, Math.min(290, A*0.34), POSES.emPe);
   soltarBola(L/2 - 220, 120); soltarBola(L/2 + 240, 80);
-  document.getElementById('carregando').style.display = 'none';
+  $('carregando').style.display = 'none';
   requestAnimationFrame(loop);
 }
 iniciar();

@@ -164,8 +164,10 @@ Veja `protocol/PROTOCOL.md` para especificação completa.
 ## ⚽ Extra: Ragdoll do Craque (sandbox da foto)
 
 Em [`ragdoll-sandbox/`](ragdoll-sandbox/) tem um joguinho onde uma foto vira um
-**boneco ragdoll articulado**: dá pra mexer os braços, mudar ele de lugar,
-explodir TNT, usar o fundo de Minecraft e tirar foto da pose.
+**boneco ragdoll articulado** (16 peças, 15 juntas com física e sombras):
+dá pra mexer os braços, mudar ele de lugar, explodir TNT, usar o fundo de
+Minecraft, tirar foto da pose e até ligar o **Modo TweenSlop** — ele dança
+sozinho estilo edit do TikTok e grava o vídeo 9:16 com phonk pra postar 📱🔥
 É só rodar `python3 -m http.server 8000` dentro da pasta e abrir no navegador —
 detalhes no [README de lá](ragdoll-sandbox/README.md).
 
