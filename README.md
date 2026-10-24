@@ -1,6 +1,15 @@
-# 🌉 Minecraft → Unity Ponte
+# 🌉 Minecraft → Unity / Godot Ponte
 
-> **Construa no Minecraft, veja na Unity em tempo real. E controle tudo de volta pela Unity.**
+> **Construa no Minecraft, veja na Unity OU Godot em tempo real. E controle tudo de volta pelo motor.**
+
+Escolha seu motor:
+
+| Motor | Pasta | Status |
+|-------|-------|--------|
+| **Unity** | `unity-package/` + `unity-project/` | ✅ Estável (URP 2021.3) |
+| **Godot 4** | `godot-project/` | ✅ Novo! Recomendado (open-source, leve) |
+
+Mesmo mod Fabric serve pros dois (mesmo protocolo `TCP 25566`).
 
 Um sistema completo de ponte bidirecional entre Minecraft (Fabric) e Unity. Você constrói no Minecraft e a construção aparece instantaneamente na Unity como blocos 3D. Pela Unity você pode **pintar blocos, deletar, preencher áreas, mudar o tempo e o clima, teleportar o player e até conversar no chat** — tudo ao vivo.
 
@@ -41,10 +50,12 @@ Um sistema completo de ponte bidirecional entre Minecraft (Fabric) e Unity. Voc�
 ```
 MINECRAFT/
 ├── minecraft-mod/          # Mod Fabric (Java 17) — o lado Minecraft
-├── unity-package/          # Pacote Unity (C#) — o lado Unity
-├── protocol/               # Definição do protocolo JSON
-├── relay/                  # Relay Node.js opcional (WebSocket → TCP)
-└── docs/                   # Guias detalhados
+├── unity-package/          # Pacote Unity (C#)
+├── unity-project/          # Projeto Unity pronto (fix valid project)
+├── godot-project/          # Projeto Godot 4 (GDScript) — NOVO!
+├── protocol/               # Protocolo JSON (compartilhado Unity/Godot)
+├── relay/                  # Relay Node.js opcional
+└── docs/                   # Guias
 ```
 
 ---
@@ -79,7 +90,15 @@ Inicie o mundo. No log você verá:
 4. Configure IP (default `127.0.0.1`) e porta `25566` no Inspector
 5. Play ▶ — blocos começam a aparecer!
 
-Ou copie manualmente a pasta `unity-package/Runtime` para `Assets/MinecraftBridge/`.
+> **Erro `Please select a valid project`?** Não abra `unity-package` como projeto! Abra `unity-project/` (já é projeto válido) ou crie um projeto vazio e importe o pacote.
+
+### 2b. Godot 4 — Alternativa (recomendada, open-source)
+
+1. Baixe Godot 4.2+
+2. Abra Godot > Importar > selecione a pasta `godot-project` > Abrir
+3. Abra `scenes/Main.tscn` > Play ▶
+
+Mesmo mod, mesma porta, zero config extra!
 
 ### 3. Relay Opcional (para rede externa / WebGL)
 

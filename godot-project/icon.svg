@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="16" fill="#2d2d2d"/>
+  <rect x="16" y="40" width="16" height="16" fill="#8B5A2B"/>
+  <rect x="32" y="40" width="16" height="16" fill="#A67C52"/>
+  <rect x="48" y="40" width="16" height="16" fill="#8B5A2B"/>
+  <rect x="32" y="56" width="16" height="16" fill="#6B8E23"/>
+  <rect x="48" y="56" width="16" height="16" fill="#8FBC8F"/>
+  <rect x="64" y="56" width="16" height="16" fill="#57a639"/>
+  <text x="64" y="100" font-family="sans-serif" font-size="12" fill="white" text-anchor="middle">GODOT ⬌ MC</text>
+</svg>

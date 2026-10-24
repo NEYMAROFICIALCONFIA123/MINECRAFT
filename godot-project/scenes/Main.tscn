@@ -1,0 +1,51 @@
+[gd_scene load_steps=4 format=3 uid="uid://bce2ca3main"]
+
+[ext_resource type="Script" path="res://scripts/Core/MinecraftBridgeClient.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/World/WorldBuilder.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/World/FlyCamera.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/UI/BridgeUI.gd" id="4"]
+
+[node name="Main" type="Node3D"]
+
+[node name="MinecraftBridgeClient" type="Node" parent="." groups=["bridge_client"] node_hero=false]
+script = ExtResource("1")
+host = "127.0.0.1"
+port = 25566
+auto_connect = true
+
+[node name="WorldBuilder" type="Node3D" parent="." node_hero=false]
+script = ExtResource("2")
+max_blocks = 200000
+use_pooling = true
+
+[node name="DirectionLight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 10, 15, 10)
+light_energy = 1.2
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 20, 30, 30)
+current = true
+fov = 70.0
+script = ExtResource("3")
+move_speed = 14.0
+
+[node name="BridgeUI" type="CanvasLayer" parent="."]
+script = ExtResource("4")
+bridge_path = NodePath("/root/BridgeClient")
+world_builder_path = NodePath("../WorldBuilder")
+camera_path = NodePath("../Camera3D")
+
+[node name="Ground" type="CSGBox3D" parent="."]
+transform = Transform3D(60, 0, 0, 0, 1, 0, 0, 0, 60, 0, -0.5, 0)
+size = Vector3(60, 1, 60)
+material = SubResource("GroundMat")
+
+[sub_resource type="StandardMaterial3D" id="GroundMat"]
+albedo_color = Color(0.4, 0.65, 0.3, 1)
+
+[node name="InstructionLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0)
+text = "Conecte o Minecraft e construa! WASD + Shift + Botao direito gira"
+font_size = 24
+outline_size = 8
