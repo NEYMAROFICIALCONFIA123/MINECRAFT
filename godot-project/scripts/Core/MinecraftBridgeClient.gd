@@ -168,11 +168,11 @@ func disconnect_from_bridge():
 	_tcp.disconnect_from_host()
 	connection_status.emit(false, "Desconectado")
 
-func is_connected() -> bool:
+func is_bridge_connected() -> bool:
 	return _connected and _tcp.get_status() == StreamPeerTCP.STATUS_CONNECTED
 
 func _send_dict(d: Dictionary):
-	if not is_connected():
+	if not is_bridge_connected():
 		push_warning("[Ponte] Não conectado, não enviou: %s" % JSON.stringify(d))
 		return
 	var line = JSON.stringify(d) + "\n"
