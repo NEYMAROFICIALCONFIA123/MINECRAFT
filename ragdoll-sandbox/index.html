@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>⚽ Ragdoll do Craque — Sandbox da Foto</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { width:100%; height:100%; overflow:hidden; background:#101418;
+    font-family:"Segoe UI", system-ui, -apple-system, Arial, sans-serif; color:#e8f0e8; }
+  #tela { position:fixed; inset:0; touch-action:none; cursor:grab; }
+  #tela:active { cursor:grabbing; }
+
+  /* ---------- barra de cima ---------- */
+  #topo { position:fixed; top:0; left:0; right:0; z-index:20; display:flex; align-items:center; gap:8px;
+    padding:8px 10px; background:linear-gradient(180deg, rgba(8,20,12,.92), rgba(8,20,12,.75));
+    border-bottom:2px solid #19a35b; backdrop-filter:blur(4px); flex-wrap:wrap; }
+  #topo h1 { font-size:17px; letter-spacing:.4px; color:#fff; text-shadow:0 2px 0 #0a5c30; margin-right:4px; white-space:nowrap; }
+  #topo h1 small { color:#9fe8bb; font-weight:600; font-size:11px; display:block; letter-spacing:1.5px; }
+  .btn { background:#17301f; color:#dff7e5; border:1px solid #2ea862; border-radius:10px;
+    padding:7px 11px; font-size:13.5px; font-weight:600; cursor:pointer; user-select:none; white-space:nowrap; }
+  .btn:hover { background:#1f4530; }
+  .btn.ativo { background:#19a35b; color:#fff; border-color:#7dffb0; box-shadow:0 0 10px rgba(50,255,140,.4); }
+  .btn.destaque { background:#ffb300; border-color:#ffd54f; color:#3a2700; }
+  .btn.destaque:hover { background:#ffc233; }
+  #topo .espaco { flex:1; }
+
+  /* ---------- ferramentas (esquerda) ---------- */
+  #ferramentas { position:fixed; left:8px; top:110px; z-index:20; display:flex; flex-direction:column; gap:6px;
+    background:rgba(8,20,12,.82); border:1px solid #2ea862; border-radius:14px; padding:8px; backdrop-filter:blur(4px); }
+  #ferramentas .rotulo { font-size:10px; letter-spacing:1.2px; color:#9fe8bb; text-align:center; font-weight:700; }
+  .ferr { width:52px; height:52px; border-radius:12px; border:2px solid #27563a; background:#12241a;
+    font-size:24px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#cfe9d6; }
+  .ferr span { font-size:8.5px; font-weight:700; letter-spacing:.3px; }
+  .ferr:hover { border-color:#3fbf72; }
+  .ferr.ativa { border-color:#7dffb0; background:#19a35b; box-shadow:0 0 12px rgba(50,255,140,.45); }
+
+  /* ---------- painel (direita) ---------- */
+  #painel { position:fixed; right:8px; top:110px; z-index:20; width:248px; max-height:calc(100% - 200px);
+    overflow-y:auto; display:flex; flex-direction:column; gap:6px; }
+  #painel details { background:rgba(8,20,12,.85); border:1px solid #2ea862; border-radius:12px; padding:7px 9px; backdrop-filter:blur(4px); }
+  #painel summary { cursor:pointer; font-weight:700; font-size:13.5px; color:#b9ffD2; list-style:none; }
+  #painel summary::-webkit-details-marker { display:none; }
+  #painel .grupo { display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
+  #painel .btn { font-size:12.5px; padding:5px 8px; border-radius:8px; }
+  #painel label { font-size:11.5px; color:#9fe8bb; font-weight:700; display:block; margin-top:7px; }
+  #painel select, #painel input[type=text] { width:100%; margin-top:3px; background:#0e2015; color:#eafff0;
+    border:1px solid #2ea862; border-radius:8px; padding:6px; font-size:13px; }
+  #painel p.dica { font-size:12px; line-height:1.55; color:#d7ecdf; margin-top:6px; }
+  .adesivo { font-size:20px !important; padding:3px 7px !important; }
+
+  /* ---------- rodapé / dicas ---------- */
+  #dicaBarra { position:fixed; left:50%; transform:translateX(-50%); bottom:8px; z-index:20;
+    background:rgba(8,20,12,.85); border:1px solid #2ea862; color:#d9ffe6; border-radius:999px;
+    padding:6px 16px; font-size:12.5px; font-weight:600; text-align:center; max-width:94vw; pointer-events:none; }
+  #carregando { position:fixed; inset:0; z-index:50; background:#0b1710; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:12px; font-size:20px; font-weight:700; }
+
+  @media (max-width:720px) {
+    #topo h1 { font-size:14px; } #topo .btn { font-size:12px; padding:6px 8px; }
+    #ferramentas { top:auto; bottom:44px; left:6px; flex-direction:row; flex-wrap:wrap; max-width:calc(100vw - 12px); }
+    #ferramentas .rotulo { display:none; }
+    .ferr { width:44px; height:44px; font-size:20px; }
+    #painel { top:118px; width:210px; max-height:calc(100% - 250px); }
+    #dicaBarra { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="tela"></canvas>
+<div id="carregando">⚽ Carregando o craque…<small style="font-size:13px;color:#9fe8bb">fatiando a foto em braços e pernas 🧩</small></div>
+
+<header id="topo">
+  <h1>⚽ RAGDOLL DO CRAQUE<small>SANDBOX DA FOTO • CAMISA 1</small></h1>
+  <button class="btn" id="btnPose" title="Congela a física: arrasta os braços/pernas pra girar e o tronco pra mudar de lugar (P)">🧍 Modo Pose</button>
+  <button class="btn" id="btnPausar" title="Pausa a física (Espaço)">⏸️ Pausar</button>
+  <button class="btn" id="btnReset" title="Recria o jogador no meio da tela (R)">🔄 Resetar</button>
+  <button class="btn" id="btnPulo" title="Lança ele pra cima!">🚀 Super Pulo</button>
+  <span class="espaco"></span>
+  <button class="btn" id="btnSom" title="Liga/desliga os sons">🔊 Som</button>
+  <button class="btn destaque" id="btnFoto" title="Baixa um PNG da cena">📸 Tirar Foto!</button>
+</header>
+
+<nav id="ferramentas">
+  <div class="rotulo">FERRAMENTAS</div>
+  <button class="ferr ativa" data-ferr="mao"       title="Arrastar e jogar (1)">✋<span>ARRASTAR</span></button>
+  <button class="ferr" data-ferr="bola"      title="Soltar bola (2)">⚽<span>BOLA</span></button>
+  <button class="ferr" data-ferr="caixa"     title="Soltar caixa (3)">📦<span>CAIXA</span></button>
+  <button class="ferr" data-ferr="bloco"     title="Bloco de grama do Minecraft (4)">🟩<span>BLOCO</span></button>
+  <button class="ferr" data-ferr="tnt"       title="TNT que explode sozinha! (5)">🧨<span>TNT</span></button>
+  <button class="ferr" data-ferr="explosao"  title="Clique = BOOM (6)">💥<span>BOOM</span></button>
+  <button class="ferr" data-ferr="plataforma" title="Arrasta pra desenhar uma rampa/plataforma (7)">🏗️<span>RAMPA</span></button>
+  <button class="ferr" data-ferr="trampolim" title="Coloca um trampolim (8)">🛝<span>PULA</span></button>
+  <button class="ferr" data-ferr="apagar"    title="Clica num objeto pra apagar (9)">🧹<span>APAGAR</span></button>
+</nav>
+
+<aside id="painel">
+  <details open>
+    <summary>🎭 Poses prontas</summary>
+    <div class="grupo" id="poses">
+      <button class="btn" data-pose="emPe">🧍 Em pé</button>
+      <button class="btn" data-pose="correndo">🏃 Correndo (a foto!)</button>
+      <button class="btn" data-pose="comemorando">🙌 Comemorando GOOOL</button>
+      <button class="btn" data-pose="chute">🦵 Chutão</button>
+      <button class="btn" data-pose="espacate">🤸 Espacate</button>
+      <button class="btn" data-pose="voando">🦸 Voando</button>
+      <button class="btn" data-pose="dancando">🕺 Dançando</button>
+      <button class="btn" data-pose="dormindo">😴 Dormindo</button>
+    </div>
+    <label>Tamanho do jogador</label>
+    <div class="grupo" id="tamanhos">
+      <button class="btn" data-tam="0.32">Pequeno</button>
+      <button class="btn ativo" data-tam="0.45">Normal</button>
+      <button class="btn" data-tam="0.62">GIGANTE</button>
+    </div>
+    <div class="grupo">
+      <button class="btn ativo" id="btnChuteira">👟 Chuteiras</button>
+    </div>
+  </details>
+
+  <details open>
+    <summary>🎨 Cenário &amp; Física</summary>
+    <label>Fundo da cena</label>
+    <select id="selFundo">
+      <option value="quadra">🏟️ Quadra azul</option>
+      <option value="foto">📷 A foto original</option>
+      <option value="minecraft">⛏️ Minecraft</option>
+      <option value="espaco">🚀 Espaço (na Lua!)</option>
+      <option value="praia">🏖️ Praia</option>
+      <option value="estudio">⬜ Estúdio branco</option>
+    </select>
+    <label>Gravidade</label>
+    <select id="selGrav">
+      <option value="0">🚀 Zero (flutuando)</option>
+      <option value="0.35">🌕 Lua</option>
+      <option value="1" selected>🌍 Terra</option>
+      <option value="2.2">🪐 Júpiter (pesadão)</option>
+    </select>
+    <div class="grupo">
+      <button class="btn" id="btnLento">🐢 Câmera lenta</button>
+      <button class="btn" id="btnLimpar">🧹 Limpar objetos</button>
+    </div>
+    <p class="dica" id="contador" style="margin-top:6px"></p>
+  </details>
+
+  <details>
+    <summary>😜 Adesivos malucos</summary>
+    <p class="dica">Clica e ele cai na cena! No <b>Modo Pose</b> dá pra arrastar e colar onde quiser (ex.: 😎 na cara dele).</p>
+    <div class="grupo" id="adesivos">
+      <button class="btn adesivo" data-emoji="😎">😎</button>
+      <button class="btn adesivo" data-emoji="👑">👑</button>
+      <button class="btn adesivo" data-emoji="🏆">🏆</button>
+      <button class="btn adesivo" data-emoji="🔥">🔥</button>
+      <button class="btn adesivo" data-emoji="💪">💪</button>
+      <button class="btn adesivo" data-emoji="⭐">⭐</button>
+      <button class="btn adesivo" data-emoji="🥇">🥇</button>
+      <button class="btn adesivo" data-emoji="💥">💥</button>
+      <button class="btn adesivo" data-emoji="😂">😂</button>
+      <button class="btn adesivo" data-emoji="🚀">🚀</button>
+    </div>
+  </details>
+
+  <details>
+    <summary>📸 Editor de foto</summary>
+    <label>Filtro</label>
+    <select id="selFiltro">
+      <option value="none">Nenhum</option>
+      <option value="grayscale(1)">Preto e branco</option>
+      <option value="sepia(0.85)">Foto antiga (sépia)</option>
+      <option value="saturate(1.9) contrast(1.12)">Cores VIVAS</option>
+      <option value="hue-rotate(120deg)">Maluco (muda as cores)</option>
+      <option value="invert(1)">Negativo</option>
+    </select>
+    <label>Texto de cima (meme)</label>
+    <input type="text" id="txtCima" placeholder="ex.: QUANDO O PROFESSOR FALTA" maxlength="60">
+    <label>Texto de baixo</label>
+    <input type="text" id="txtBaixo" placeholder="ex.: EU INDO PRA QUADRA 🏃" maxlength="60">
+    <div class="grupo"><button class="btn destaque" id="btnFoto2">📸 Baixar a foto (PNG)</button></div>
+  </details>
+
+  <details>
+    <summary>❓ Como jogar</summary>
+    <p class="dica">
+      ✋ <b>Arrasta qualquer parte</b> do corpo dele pra puxar, girar e <b>jogar ele longe</b>!<br><br>
+      🧍 <b>Modo Pose</b>: a física congela — arrasta um <b>braço/perna/cabeça</b> pra girar na junta,
+      arrasta o <b>tronco</b> (ou o céu) pra <b>mudar ele de lugar</b>. Rodinha do mouse gira devagarinho.<br><br>
+      🧨 A <b>TNT explode sozinha</b> em 3s… e explode as outras junto!<br><br>
+      ⌨️ Teclas: <b>1–9</b> ferramentas • <b>P</b> pose • <b>Espaço</b> pausar • <b>R</b> resetar<br><br>
+      📸 Monta a pose, escolhe o fundo e <b>tira a foto</b> pra mandar pros amigos!
+    </p>
+  </details>
+</aside>
+
+<div id="dicaBarra">✋ Arrasta o braço, a perna, a cabeça… e joga ele longe! Liga o 🧍 Modo Pose pra montar a pose perfeita e tirar 📸</div>
+
+<script src="lib/matter.min.js"></script>
+<script src="pecas.js"></script>
+<script>
+'use strict';
+/* =====================================================================
+   RAGDOLL DO CRAQUE — sandbox com a foto fatiada em pecas articuladas
+   Fisica: Matter.js | Desenho: Canvas 2D (as pecas sao PNGs da foto)
+   ===================================================================== */
+const { Engine, Bodies, Body, Composite, Constraint, Events, Query } = Matter;
+
+const tela = document.getElementById('tela');
+const ctx = tela.getContext('2d');
+let L = innerWidth, A = innerHeight, DPR = Math.min(devicePixelRatio || 1, 2);
+let chaoY = A - 64;
+
+/* ---------------- estado ---------------- */
+let ferramenta = 'mao';
+let poseModo = false, pausado = false, lento = false, somLigado = true, chuteiras = true;
+let escala = 0.45;                 // tamanho do jogador (foto -> tela)
+let craque = null;                 // { corpos:{nome:body}, ligacoes:[...] }
+let objetos = [];                  // bodies soltos (bola, caixa, TNT...)
+let estaticos = [];                // chao/paredes
+let particulas = [];
+let tremida = 0;
+let fundoAtual = 'quadra', fundoCanvas = null;
+let ultimoTudum = 0;
+
+/* hierarquia do corpo: quem e filho de quem (a junta e o 'pivot' do filho) */
+const MAE = { cabeca:'tronco', bracoE:'tronco', bracoD:'tronco', anteD:'bracoD',
+              quadril:'tronco', coxaE:'quadril', canelaE:'coxaE', coxaD:'quadril', canelaD:'coxaD' };
+const FK_ORDEM = ['tronco','cabeca','bracoE','bracoD','anteD','quadril','coxaE','canelaE','coxaD','canelaD'];
+const NOMES = { cabeca:'Cabeça', tronco:'Tronco', bracoE:'Braço esquerdo', bracoD:'Braço direito',
+  anteD:'Antebraço', quadril:'Quadril', coxaE:'Coxa esquerda', canelaE:'Canela esquerda',
+  coxaD:'Coxa direita', canelaD:'Canela direita' };
+/* onde desenhar a chuteira 👟 (offset na foto a partir do centro da peca) */
+const PE = { canelaE:[8,86], canelaD:[12,86] };
+
+const POSES = { // angulos em graus (0 = exatamente como na foto)
+  emPe:        { tronco:0,   cabeca:-3, bracoE:10,   bracoD:20,  anteD:8,   quadril:0,  coxaE:6,   canelaE:4,  coxaD:12,  canelaD:10 },
+  correndo:    { tronco:0,   cabeca:0,  bracoE:0,    bracoD:0,   anteD:0,   quadril:0,  coxaE:0,   canelaE:0,  coxaD:0,   canelaD:0 },
+  comemorando: { tronco:-4,  cabeca:-8, bracoE:-140, bracoD:155, anteD:170, quadril:0,  coxaE:12,  canelaE:10, coxaD:20,  canelaD:45 },
+  chute:       { tronco:6,   cabeca:0,  bracoE:40,   bracoD:-30, anteD:-15, quadril:4,  coxaE:8,   canelaE:6,  coxaD:-92, canelaD:-78 },
+  espacate:    { tronco:0,   cabeca:-4, bracoE:-60,  bracoD:70,  anteD:60,  quadril:0,  coxaE:82,  canelaE:84, coxaD:-70, canelaD:-72 },
+  voando:      { tronco:88,  cabeca:80, bracoE:-95,  bracoD:-80, anteD:-85, quadril:88, coxaE:93,  canelaE:91, coxaD:97,  canelaD:95 },
+  dancando:    { tronco:-6,  cabeca:12, bracoE:-120, bracoD:60,  anteD:130, quadril:4,  coxaE:25,  canelaE:55, coxaD:-15, canelaD:-5 },
+  dormindo:    { tronco:90,  cabeca:97, bracoE:100,  bracoD:106, anteD:100, quadril:90, coxaE:95,  canelaE:93, coxaD:86,  canelaD:88 },
+};
+
+/* ---------------- utilidades ---------------- */
+const rad = g => g * Math.PI / 180;
+function rot(v, graus) { const t = rad(graus), c = Math.cos(t), s = Math.sin(t);
+  return { x: v.x * c - v.y * s, y: v.x * s + v.y * c }; }
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const centro = n => PECAS_DADOS[n].centro;
+const pivot  = n => PECAS_DADOS[n].pivot;
+function descendentes(nome){ // a peca + todos os filhos/netos...
+  const r = [nome]; for (const k in MAE) if (MAE[k] === nome) r.push(...descendentes(k)); return r; }
+/* ponto da foto -> ponto do mundo, dado o corpo da peca */
+function fotoParaMundo(nome, pontoFoto){
+  const b = craque.corpos[nome], c = centro(nome);
+  const local = { x:(pontoFoto[0]-c[0])*escala, y:(pontoFoto[1]-c[1])*escala };
+  const r = rot(local, b.angle * 180/Math.PI);
+  return { x: b.position.x + r.x, y: b.position.y + r.y };
+}
+
+/* ---------------- motor ---------------- */
+const engine = Engine.create();
+engine.gravity.y = 1;
+
+function criarLimites(){
+  for (const b of estaticos) Composite.remove(engine.world, b);
+  estaticos = [
+    Bodies.rectangle(L/2, chaoY + 40, L + 400, 80, { isStatic:true, label:'chao' }),
+    Bodies.rectangle(-35, A/2, 70, A*3, { isStatic:true, label:'parede' }),
+    Bodies.rectangle(L+35, A/2, 70, A*3, { isStatic:true, label:'parede' }),
+  ];
+  Composite.add(engine.world, estaticos);
+}
+
+/* monta (ou remonta) o jogador com cinematica direta a partir dos angulos */
+function montarCraque(x, y, angulos){
+  if (craque){ for (const n in craque.corpos) Composite.remove(engine.world, craque.corpos[n]);
+               for (const c of craque.ligacoes) Composite.remove(engine.world, c); }
+  const pos = { tronco:{ x, y } };
+  for (const nome of FK_ORDEM.slice(1)){
+    const mae = MAE[nome], junta = pivot(nome), cm = centro(mae), cp = centro(nome);
+    const jw = rot({ x:(junta[0]-cm[0])*escala, y:(junta[1]-cm[1])*escala }, angulos[mae]);
+    const off = rot({ x:(cp[0]-junta[0])*escala, y:(cp[1]-junta[1])*escala }, angulos[nome]);
+    pos[nome] = { x: pos[mae].x + jw.x + off.x, y: pos[mae].y + jw.y + off.y };
+  }
+  const corpos = {};
+  for (const nome of FK_ORDEM){
+    const d = PECAS_DADOS[nome];
+    corpos[nome] = Bodies.rectangle(pos[nome].x, pos[nome].y,
+      Math.max(14, d.bbox[2]*escala*0.82), Math.max(14, d.bbox[3]*escala*0.88), {
+      angle: rad(angulos[nome]), label:'peca:'+nome,
+      chamfer:{ radius: Math.min(d.bbox[2], d.bbox[3])*escala*0.28 },
+      friction:0.6, frictionAir:0.016, restitution:0.05,
+      density: nome==='tronco' ? 0.0016 : 0.001,
+      collisionFilter:{ group:-1 },   // pecas nao batem uma na outra
+    });
+  }
+  const ligacoes = [];
+  for (const nome of FK_ORDEM.slice(1)){
+    const mae = MAE[nome], junta = pivot(nome), cm = centro(mae), cp = centro(nome);
+    ligacoes.push(Constraint.create({
+      bodyA: corpos[mae], pointA:{ x:(junta[0]-cm[0])*escala, y:(junta[1]-cm[1])*escala },
+      bodyB: corpos[nome], pointB:{ x:(junta[0]-cp[0])*escala, y:(junta[1]-cp[1])*escala },
+      length:0, stiffness:0.95, damping:0.08,
+    }));
+  }
+  Composite.add(engine.world, [...Object.values(corpos), ...ligacoes]);
+  craque = { corpos, ligacoes };
+}
+
+/* aplica uma pose mantendo o tronco onde esta (gira junto com ele) */
+function aplicarPose(pose){
+  if (!craque) return;
+  const t = craque.corpos.tronco;
+  const base = t.angle*180/Math.PI - (pose.tronco||0);
+  const ang = {}; for (const n of FK_ORDEM) ang[n] = (pose[n]||0) + base;
+  const pos = { tronco:{ x:t.position.x, y:t.position.y } };
+  for (const nome of FK_ORDEM.slice(1)){
+    const mae = MAE[nome], junta = pivot(nome), cm = centro(mae), cp = centro(nome);
+    const jw = rot({ x:(junta[0]-cm[0])*escala, y:(junta[1]-cm[1])*escala }, ang[mae]);
+    const off = rot({ x:(cp[0]-junta[0])*escala, y:(cp[1]-junta[1])*escala }, ang[nome]);
+    pos[nome] = { x: pos[mae].x+jw.x+off.x, y: pos[mae].y+jw.y+off.y };
+  }
+  for (const nome of FK_ORDEM){
+    const b = craque.corpos[nome];
+    Body.setPosition(b, pos[nome]); Body.setAngle(b, rad(ang[nome]));
+    Body.setVelocity(b, {x:0,y:0}); Body.setAngularVelocity(b, 0);
+  }
+  tocarSom('pop');
+}
+
+/* ---------------- objetos ---------------- */
+function adicionarObjeto(body, desenho){
+  body.plugin.desenho = desenho;
+  objetos.push(body); Composite.add(engine.world, body);
+  if (objetos.length > 120){ const velho = objetos.shift(); Composite.remove(engine.world, velho); }
+  atualizarContador();
+}
+function removerObjeto(body){
+  objetos = objetos.filter(o => o !== body); Composite.remove(engine.world, body); atualizarContador();
+}
+function atualizarContador(){
+  document.getElementById('contador').textContent =
+    objetos.length ? `🧸 ${objetos.length} objeto(s) na cena` : '';
+}
+const opSolto = { friction:0.4, frictionAir:0.008, restitution:0.35, density:0.001 };
+function soltarBola(x,y){ const r = 22+Math.random()*14;
+  adicionarObjeto(Bodies.circle(x,y,r,{...opSolto, restitution:0.75, label:'bola'}), {tipo:'bola', r}); }
+function soltarCaixa(x,y){ const t = 42+Math.random()*26;
+  adicionarObjeto(Bodies.rectangle(x,y,t,t,{...opSolto, label:'caixa'}), {tipo:'caixa', t}); }
+function soltarBloco(x,y){ const t = 48;
+  adicionarObjeto(Bodies.rectangle(x,y,t,t,{...opSolto, label:'bloco'}), {tipo:'bloco', t}); }
+function soltarTNT(x,y){ const t = 46;
+  const b = Bodies.rectangle(x,y,t,t,{...opSolto, label:'tnt'});
+  adicionarObjeto(b, {tipo:'tnt', t, explodeEm: performance.now()+3000}); tocarSom('pop'); }
+function soltarEmoji(x,y,emoji){ const t = 44;
+  adicionarObjeto(Bodies.rectangle(x,y,t,t,{...opSolto, label:'adesivo'}), {tipo:'emoji', t, emoji}); }
+function colocarTrampolim(x,y){ const w=160,h=16;
+  adicionarObjeto(Bodies.rectangle(x, Math.min(y, chaoY-h/2-14), w, h,
+    { isStatic:true, restitution:1.35, friction:0, label:'trampolim' }), {tipo:'trampolim', w, h}); }
+function criarPlataforma(p1,p2){
+  const dx=p2.x-p1.x, dy=p2.y-p1.y, comp=Math.hypot(dx,dy); if (comp<30) return;
+  adicionarObjeto(Bodies.rectangle((p1.x+p2.x)/2,(p1.y+p2.y)/2, comp, 15,
+    { isStatic:true, angle:Math.atan2(dy,dx), friction:0.7, label:'plataforma' }),
+    {tipo:'plataforma', w:comp, h:15});
+}
+
+/* ---------------- explosao / particulas / som ---------------- */
+function explodir(x, y, forca=17, raio=280){
+  const alvos = [...(craque?Object.values(craque.corpos):[]), ...objetos.filter(o=>!o.isStatic)];
+  for (const b of alvos){
+    const dx=b.position.x-x, dy=b.position.y-y, d=Math.hypot(dx,dy);
+    if (d < raio){
+      const f = forca*(1-d/raio)+3, a = Math.atan2(dy,dx);
+      Body.setVelocity(b, { x:b.velocity.x+Math.cos(a)*f, y:b.velocity.y+Math.sin(a)*f-3 });
+      Body.setAngularVelocity(b, b.angularVelocity + (Math.random()-0.5)*0.45);
+      if (b.label==='tnt' && b.plugin.desenho) b.plugin.desenho.explodeEm = performance.now()+140; // corrente!
+    }
+  }
+  for (let i=0;i<46;i++){ const a=Math.random()*Math.PI*2, v=2+Math.random()*9;
+    particulas.push({ x,y, vx:Math.cos(a)*v, vy:Math.sin(a)*v-2, vida:1,
+      cor:['#ffb300','#ff5722','#ffee58','#9e9e9e'][i%4], t:3+Math.random()*6 }); }
+  tremida = 14; tocarSom('boom');
+}
+let audioCtx = null;
+function tocarSom(tipo){
+  if (!somLigado) return;
+  try{
+    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+    if (audioCtx.state==='suspended') audioCtx.resume();
+    const t = audioCtx.currentTime;
+    if (tipo==='boom'){
+      const buf = audioCtx.createBuffer(1, audioCtx.sampleRate*0.5, audioCtx.sampleRate);
+      const d = buf.getChannelData(0); for (let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length);
+      const src = audioCtx.createBufferSource(); src.buffer=buf;
+      const f = audioCtx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=420;
+      const g = audioCtx.createGain(); g.gain.setValueAtTime(0.9,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.5);
+      src.connect(f); f.connect(g); g.connect(audioCtx.destination); src.start();
+    } else { // pop / tudum
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type='sine'; const f0 = tipo==='pop'?520:130;
+      o.frequency.setValueAtTime(f0,t); o.frequency.exponentialRampToValueAtTime(f0*0.45,t+0.12);
+      g.gain.setValueAtTime(tipo==='pop'?0.18:0.3,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.14);
+      o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(t+0.15);
+    }
+  }catch(e){ /* sem audio, sem problema */ }
+}
+Events.on(engine, 'collisionStart', ev => { // "tudum" nas batidas fortes
+  const agora = performance.now(); if (agora - ultimoTudum < 130) return;
+  for (const par of ev.pairs){
+    const v = Math.max(par.bodyA.speed, par.bodyB.speed);
+    if (v > 7){ ultimoTudum = agora; tocarSom('tudum'); break; }
+  }
+});
+
+/* ---------------- fundos (pre-desenhados) ---------------- */
+const imgFoto = new Image(); imgFoto.src = 'assets/foto-original.png';
+function pintarFundo(){
+  fundoCanvas = document.createElement('canvas');
+  fundoCanvas.width = L; fundoCanvas.height = A;
+  const g = fundoCanvas.getContext('2d');
+  const rnd = mulberry32(42);
+  const ceu = (c1,c2)=>{ const gr=g.createLinearGradient(0,0,0,A); gr.addColorStop(0,c1); gr.addColorStop(1,c2);
+    g.fillStyle=gr; g.fillRect(0,0,L,A); };
+  if (fundoAtual==='foto' && imgFoto.complete && imgFoto.naturalWidth){
+    const s = Math.max(L/imgFoto.naturalWidth, A/imgFoto.naturalHeight);
+    g.drawImage(imgFoto, (L-imgFoto.naturalWidth*s)/2, (A-imgFoto.naturalHeight*s)/2,
+      imgFoto.naturalWidth*s, imgFoto.naturalHeight*s);
+  } else if (fundoAtual==='minecraft'){
+    ceu('#6fb7ff','#cfefff');
+    g.fillStyle='#fff176'; g.fillRect(L-150,60,74,74); g.fillStyle='rgba(255,255,255,.9)';
+    for (let i=0;i<7;i++){ const y=40+rnd()*130, x=rnd()*L; g.fillRect(x,y,90+rnd()*90,22); g.fillRect(x+24,y-16,50,16); }
+    g.fillStyle='#5aa13c'; for (let x=0;x<L;x+=64){ const h=40+((x*7919)%3)*26; g.fillRect(x, chaoY-h, 64, h); }
+    g.fillStyle='#7a5230'; g.fillRect(0,chaoY+16,L,A-chaoY);
+    g.fillStyle='#4caf50'; g.fillRect(0,chaoY,L,16);
+    for (let i=0;i<L/8;i++){ g.fillStyle=rnd()>.5?'#8a5a34':'#6b4423';
+      g.fillRect(rnd()*L, chaoY+18+rnd()*(A-chaoY-22), 7,7); }
+  } else if (fundoAtual==='espaco'){
+    ceu('#030312','#14143a');
+    for (let i=0;i<220;i++){ g.fillStyle=`rgba(255,255,255,${0.3+rnd()*0.7})`;
+      g.fillRect(rnd()*L, rnd()*chaoY, rnd()>.9?3:2, rnd()>.9?3:2); }
+    g.fillStyle='#ff8a65'; g.beginPath(); g.arc(L-160,140,52,0,7); g.fill();
+    g.fillStyle='#e64a19'; g.beginPath(); g.arc(L-178,124,11,0,7); g.arc(L-138,158,8,0,7); g.fill();
+    g.fillStyle='#c9ccd6'; g.fillRect(0,chaoY,L,A-chaoY);
+    g.fillStyle='#9aa0ae'; for (let i=0;i<9;i++){ g.beginPath();
+      g.ellipse(rnd()*L, chaoY+16+rnd()*(A-chaoY-20), 16+rnd()*26, 6+rnd()*7, 0, 0, 7); g.fill(); }
+  } else if (fundoAtual==='praia'){
+    ceu('#4fc3f7','#e1f5fe');
+    g.fillStyle='#ffee58'; g.beginPath(); g.arc(110,100,46,0,7); g.fill();
+    g.fillStyle='#0288d1'; g.fillRect(0,chaoY-150,L,150);
+    g.fillStyle='rgba(255,255,255,.65)'; for (let i=0;i<26;i++) g.fillRect(rnd()*L, chaoY-140+rnd()*120, 26+rnd()*40, 4);
+    g.fillStyle='#ffe9a8'; g.fillRect(0,chaoY,L,A-chaoY);
+    g.fillStyle='#f2d38a'; for (let i=0;i<L/6;i++) g.fillRect(rnd()*L, chaoY+rnd()*(A-chaoY), 4,3);
+  } else if (fundoAtual==='estudio'){
+    ceu('#ffffff','#dfe3e6');
+    g.fillStyle='#cdd3d8'; g.fillRect(0,chaoY,L,A-chaoY);
+    g.fillStyle='rgba(0,0,0,.10)'; g.beginPath(); g.ellipse(L/2,chaoY+16,L*0.32,15,0,0,7); g.fill();
+  } else { // quadra (parecida com a foto!)
+    ceu('#b9b1a1','#a89f8e');
+    for (let i=0;i<L/3;i++){ g.fillStyle=`rgba(60,55,45,${rnd()*0.13})`;
+      g.fillRect(rnd()*L, rnd()*chaoY*0.55, 5+rnd()*22, 4+rnd()*12); }
+    g.fillStyle='#e8a33d'; g.fillRect(L*0.42, 0, 64, chaoY*0.55); // pilar amarelo rs
+    g.fillStyle='#1c4f9c'; g.fillRect(0, chaoY*0.55, L, chaoY*0.45);
+    g.fillStyle='rgba(255,255,255,.25)'; g.fillRect(0, chaoY*0.72, L, 3); g.fillRect(0, chaoY*0.9, L, 3);
+    g.fillStyle='#7f95a8'; g.fillRect(0,chaoY,L,A-chaoY);
+    g.fillStyle='rgba(255,255,255,.8)'; g.fillRect(0,chaoY+22,L,5);
+    g.beginPath(); g.arc(L/2, chaoY+24, 90, 0, Math.PI); g.strokeStyle='rgba(255,255,255,.8)'; g.lineWidth=5; g.stroke();
+  }
+}
+
+/* ---------------- desenho ---------------- */
+const imagens = {};
+function desenharEmoji(x,y,angulo,emoji,tam){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(angulo);
+  ctx.font = `${tam}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+  ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(emoji,0,2); ctx.restore();
+}
+function desenhar(){
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  if (tremida>0){ ctx.translate((Math.random()-0.5)*tremida,(Math.random()-0.5)*tremida); tremida*=0.86; }
+  if (fundoCanvas) ctx.drawImage(fundoCanvas,0,0,L,A);
+
+  /* objetos */
+  for (const b of objetos){
+    const d = b.plugin.desenho, {x,y} = b.position, a = b.angle;
+    if (!d) continue;
+    if (d.tipo==='bola') desenharEmoji(x,y,a,'⚽', d.r*2.05);
+    else if (d.tipo==='caixa') desenharEmoji(x,y,a,'📦', d.t*1.05);
+    else if (d.tipo==='emoji') desenharEmoji(x,y,a,d.emoji, d.t*1.1);
+    else if (d.tipo==='bloco'){
+      ctx.save(); ctx.translate(x,y); ctx.rotate(a);
+      ctx.fillStyle='#7a5230'; ctx.fillRect(-d.t/2,-d.t/2,d.t,d.t);
+      ctx.fillStyle='#8a5a34'; [[-14,4],[6,12],[-4,-2],[12,-8],[-16,14]].forEach(p=>ctx.fillRect(p[0],p[1],8,7));
+      ctx.fillStyle='#4caf50'; ctx.fillRect(-d.t/2,-d.t/2,d.t,13);
+      ctx.fillStyle='#66bb6a'; ctx.fillRect(-d.t/2,-d.t/2,d.t,5);
+      ctx.strokeStyle='rgba(0,0,0,.35)'; ctx.strokeRect(-d.t/2,-d.t/2,d.t,d.t); ctx.restore();
+    } else if (d.tipo==='tnt'){
+      const falta = Math.max(0,(d.explodeEm-performance.now())/1000);
+      const pisca = falta<1 && Math.floor(performance.now()/110)%2===0;
+      ctx.save(); ctx.translate(x,y); ctx.rotate(a);
+      ctx.fillStyle = pisca ? '#ffffff' : '#d32f2f'; ctx.fillRect(-d.t/2,-d.t/2,d.t,d.t);
+      ctx.fillStyle='#fff'; ctx.fillRect(-d.t/2,-9,d.t,18);
+      ctx.fillStyle = pisca ? '#d32f2f' : '#212121'; ctx.font='900 15px Arial';
+      ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('TNT',0,1);
+      ctx.restore();
+      ctx.fillStyle='#fff'; ctx.font='800 14px Arial'; ctx.textAlign='center';
+      ctx.fillText(falta.toFixed(1), x, y-d.t/2-12);
+    } else if (d.tipo==='plataforma'){
+      ctx.save(); ctx.translate(x,y); ctx.rotate(a);
+      ctx.fillStyle='#a9743f'; ctx.fillRect(-d.w/2,-d.h/2,d.w,d.h);
+      ctx.fillStyle='#c08a4e'; ctx.fillRect(-d.w/2,-d.h/2,d.w,5);
+      ctx.strokeStyle='rgba(0,0,0,.4)'; ctx.strokeRect(-d.w/2,-d.h/2,d.w,d.h); ctx.restore();
+    } else if (d.tipo==='trampolim'){
+      ctx.save(); ctx.translate(x,y);
+      ctx.strokeStyle='#37474f'; ctx.lineWidth=5;
+      ctx.beginPath(); ctx.moveTo(-d.w/2+12,0); ctx.lineTo(-d.w/2+2,20);
+      ctx.moveTo(d.w/2-12,0); ctx.lineTo(d.w/2-2,20); ctx.stroke();
+      ctx.fillStyle='#c62828'; ctx.fillRect(-d.w/2,-d.h/2,d.w,d.h);
+      ctx.fillStyle='#1565c0'; ctx.fillRect(-d.w/2+14,-d.h/2,d.w-28,d.h); ctx.restore();
+    }
+  }
+  /* linha da rampa sendo desenhada */
+  if (rampaInicio && ponteiro.ativo){
+    ctx.strokeStyle='#7dffb0'; ctx.lineWidth=5; ctx.setLineDash([9,6]);
+    ctx.beginPath(); ctx.moveTo(rampaInicio.x,rampaInicio.y); ctx.lineTo(ponteiro.x,ponteiro.y); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  /* o craque (pecas na ordem certa) */
+  if (craque){
+    for (const nome of window.ORDEM_DESENHO){
+      const b = craque.corpos[nome], d = PECAS_DADOS[nome], img = imagens[nome];
+      if (!img) continue;
+      ctx.save(); ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle);
+      ctx.drawImage(img, -d.bbox[2]*escala/2, -d.bbox[3]*escala/2, d.bbox[2]*escala, d.bbox[3]*escala);
+      if (chuteiras && PE[nome]){
+        ctx.font = `${Math.round(96*escala)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText('👟', PE[nome][0]*escala, PE[nome][1]*escala + 14*escala);
+      }
+      ctx.restore();
+    }
+    if (poseModo){ // bolinhas nas juntas
+      for (const nome of FK_ORDEM.slice(1)){
+        const p = fotoParaMundo(MAE[nome], pivot(nome));
+        ctx.fillStyle='#19a35b'; ctx.strokeStyle='#fff'; ctx.lineWidth=2.5;
+        ctx.beginPath(); ctx.arc(p.x,p.y,8,0,7); ctx.fill(); ctx.stroke();
+      }
+      ctx.fillStyle='rgba(8,20,12,.85)'; ctx.fillRect(L/2-265, 104, 530, 30);
+      ctx.fillStyle='#b9ffd2'; ctx.font='700 14px Arial'; ctx.textAlign='center';
+      ctx.fillText('🧍 MODO POSE: arrasta um braço/perna pra girar • o tronco (ou o céu) pra mover ele', L/2, 124);
+    }
+  }
+
+  /* particulas */
+  for (const p of particulas){ ctx.globalAlpha = Math.max(0,p.vida);
+    ctx.fillStyle=p.cor; ctx.fillRect(p.x-p.t/2,p.y-p.t/2,p.t,p.t); }
+  ctx.globalAlpha = 1;
+
+  /* texto meme (preview ao vivo) */
+  const tc = document.getElementById('txtCima').value.trim(), tb = document.getElementById('txtBaixo').value.trim();
+  const meme = (txt,y)=>{ if(!txt) return;
+    ctx.font = `900 ${Math.max(24, L*0.042)}px Impact, "Arial Black", sans-serif`;
+    ctx.textAlign='center'; ctx.lineWidth=8; ctx.strokeStyle='#000'; ctx.fillStyle='#fff';
+    ctx.strokeText(txt.toUpperCase(), L/2, y); ctx.fillText(txt.toUpperCase(), L/2, y); };
+  meme(tc, 150); meme(tb, A-92);
+}
+
+/* ---------------- loop principal ---------------- */
+let ultimo = performance.now(), acum = 0;
+function loop(agora){
+  requestAnimationFrame(loop);
+  const dt = Math.min(50, agora-ultimo); ultimo = agora;
+  if (!pausado && !poseModo){
+    acum += dt * (lento ? 0.32 : 1);
+    let passos = 0;
+    while (acum >= 16.666 && passos < 3){ Engine.update(engine, 16.666); acum -= 16.666; passos++; }
+    if (passos===3) acum = 0;
+  }
+  /* TNTs com pavio aceso */
+  for (const b of [...objetos]){
+    const d = b.plugin.desenho;
+    if (d && d.tipo==='tnt' && agora >= d.explodeEm){
+      const {x,y} = b.position; removerObjeto(b); explodir(x,y,19,300);
+    }
+  }
+  /* particulas */
+  for (const p of particulas){ p.x+=p.vx; p.y+=p.vy; p.vy+=0.25; p.vida-=0.022; }
+  particulas = particulas.filter(p=>p.vida>0);
+  desenhar();
+}
+
+/* ---------------- interacao (mouse + toque) ---------------- */
+const ponteiro = { x:0, y:0, ativo:false };
+let agarrado = null;             // constraint da mao (fisica)
+let arrastoPose = null;          // {tipo:'girar'|'mover'|'objeto', ...}
+let rampaInicio = null;
+
+function pecaNoPonto(p){
+  if (!craque) return null;
+  const achados = Query.point(Object.values(craque.corpos), p);
+  if (!achados.length) return null;
+  // a que esta mais "na frente" no desenho ganha
+  achados.sort((a,b2)=> window.ORDEM_DESENHO.indexOf(a.label.slice(5)) - window.ORDEM_DESENHO.indexOf(b2.label.slice(5)));
+  return achados[achados.length-1].label.slice(5);
+}
+function objetoNoPonto(p){ const a = Query.point(objetos, p); return a.length ? a[a.length-1] : null; }
+
+tela.addEventListener('pointerdown', ev => {
+  tela.setPointerCapture(ev.pointerId);
+  ponteiro.x = ev.clientX; ponteiro.y = ev.clientY; ponteiro.ativo = true;
+  const p = { x:ponteiro.x, y:ponteiro.y };
+
+  if (poseModo){ // ---- MODO POSE: girar membro / mover ele / mover objeto
+    const obj = objetoNoPonto(p);
+    const nome = obj ? null : pecaNoPonto(p);
+    if (obj){ arrastoPose = { tipo:'objeto', body:obj, dx:obj.position.x-p.x, dy:obj.position.y-p.y }; }
+    else if (nome && nome!=='tronco'){
+      const junta = fotoParaMundo(MAE[nome], pivot(nome));
+      const ini = {}; for (const n of descendentes(nome)){ const b=craque.corpos[n];
+        ini[n] = { x:b.position.x, y:b.position.y, a:b.angle }; }
+      arrastoPose = { tipo:'girar', junta, ini, angIni: Math.atan2(p.y-junta.y, p.x-junta.x),
+                      membros: descendentes(nome) };
+    } else if (craque){ arrastoPose = { tipo:'mover', ini:{...p} }; } // tronco ou céu = mover ele todo
+    return;
+  }
+  switch (ferramenta){ // ---- ferramentas na fisica
+    case 'bola': soltarBola(p.x,p.y); break;
+    case 'caixa': soltarCaixa(p.x,p.y); break;
+    case 'bloco': soltarBloco(p.x,p.y); break;
+    case 'tnt': soltarTNT(p.x,p.y); break;
+    case 'explosao': explodir(p.x,p.y); break;
+    case 'trampolim': colocarTrampolim(p.x,p.y); tocarSom('pop'); break;
+    case 'plataforma': rampaInicio = p; break;
+    case 'apagar': { const o = objetoNoPonto(p); if (o){ removerObjeto(o); tocarSom('pop'); } break; }
+    default: { // mao: agarra qualquer corpo e joga!
+      const alvos = [...(craque?Object.values(craque.corpos):[]), ...objetos.filter(o=>!o.isStatic)];
+      const achados = Query.point(alvos, p);
+      if (achados.length){
+        const b = achados[achados.length-1];
+        const local = rot({ x:p.x-b.position.x, y:p.y-b.position.y }, -b.angle*180/Math.PI);
+        agarrado = Constraint.create({ pointA:p, bodyB:b, pointB:local, stiffness:0.14, damping:0.08, length:0 });
+        Composite.add(engine.world, agarrado); tocarSom('pop');
+      }
+    }
+  }
+});
+tela.addEventListener('pointermove', ev => {
+  ponteiro.x = ev.clientX; ponteiro.y = ev.clientY;
+  const p = { x:ponteiro.x, y:ponteiro.y };
+  if (agarrado) agarrado.pointA = p;
+  if (arrastoPose && craque){
+    if (arrastoPose.tipo==='objeto'){
+      Body.setPosition(arrastoPose.body, { x:p.x+arrastoPose.dx, y:p.y+arrastoPose.dy });
+    } else if (arrastoPose.tipo==='mover'){
+      const dx = p.x-arrastoPose.ini.x, dy = p.y-arrastoPose.ini.y; arrastoPose.ini = {...p};
+      for (const n in craque.corpos){ const b=craque.corpos[n];
+        Body.setPosition(b, { x:b.position.x+dx, y:b.position.y+dy });
+        Body.setVelocity(b,{x:0,y:0}); }
+    } else if (arrastoPose.tipo==='girar'){
+      const delta = Math.atan2(p.y-arrastoPose.junta.y, p.x-arrastoPose.junta.x) - arrastoPose.angIni;
+      for (const n of arrastoPose.membros){
+        const b = craque.corpos[n], ini = arrastoPose.ini[n];
+        const r = rot({ x:ini.x-arrastoPose.junta.x, y:ini.y-arrastoPose.junta.y }, delta*180/Math.PI);
+        Body.setPosition(b, { x:arrastoPose.junta.x+r.x, y:arrastoPose.junta.y+r.y });
+        Body.setAngle(b, ini.a + delta);
+        Body.setVelocity(b,{x:0,y:0}); Body.setAngularVelocity(b,0);
+      }
+    }
+  }
+});
+function soltarPonteiro(){
+  ponteiro.ativo = false;
+  if (agarrado){ Composite.remove(engine.world, agarrado); agarrado = null; }
+  if (rampaInicio){ criarPlataforma(rampaInicio, {x:ponteiro.x,y:ponteiro.y}); rampaInicio=null; tocarSom('pop'); }
+  arrastoPose = null;
+}
+tela.addEventListener('pointerup', soltarPonteiro);
+tela.addEventListener('pointercancel', soltarPonteiro);
+tela.addEventListener('contextmenu', ev => { // botao direito apaga objeto
+  ev.preventDefault(); const o = objetoNoPonto({x:ev.clientX,y:ev.clientY});
+  if (o) removerObjeto(o);
+});
+tela.addEventListener('wheel', ev => { // rodinha gira o membro no modo pose
+  if (!poseModo || !craque) return;
+  ev.preventDefault();
+  const nome = pecaNoPonto({x:ev.clientX,y:ev.clientY});
+  if (!nome || nome==='tronco') return;
+  const junta = fotoParaMundo(MAE[nome], pivot(nome));
+  const delta = rad(ev.deltaY > 0 ? 6 : -6);
+  for (const n of descendentes(nome)){ const b=craque.corpos[n];
+    const r = rot({ x:b.position.x-junta.x, y:b.position.y-junta.y }, delta*180/Math.PI);
+    Body.setPosition(b,{ x:junta.x+r.x, y:junta.y+r.y }); Body.setAngle(b, b.angle+delta);
+    Body.setVelocity(b,{x:0,y:0}); Body.setAngularVelocity(b,0); }
+}, { passive:false });
+tela.addEventListener('dblclick', ev => { // clique duplo gira objeto no modo pose
+  if (!poseModo) return;
+  const o = objetoNoPonto({x:ev.clientX,y:ev.clientY});
+  if (o) Body.setAngle(o, o.angle + rad(15));
+});
+
+/* ---------------- botoes / UI ---------------- */
+const $ = id => document.getElementById(id);
+function selecionarFerramenta(nome, botao){
+  ferramenta = nome;
+  document.querySelectorAll('.ferr').forEach(b=>b.classList.toggle('ativa', b.dataset.ferr===nome));
+  if (poseModo && nome!=='mao') alternarPose(false); // ferramenta de fisica sai do modo pose
+}
+document.querySelectorAll('.ferr').forEach(b =>
+  b.addEventListener('click', ()=>selecionarFerramenta(b.dataset.ferr, b)));
+
+function alternarPose(force){
+  poseModo = force !== undefined ? force : !poseModo;
+  $('btnPose').classList.toggle('ativo', poseModo);
+  if (poseModo && craque) for (const n in craque.corpos){
+    Body.setVelocity(craque.corpos[n],{x:0,y:0}); Body.setAngularVelocity(craque.corpos[n],0); }
+  tocarSom('pop');
+}
+$('btnPose').addEventListener('click', ()=>alternarPose());
+function alternarPausa(){ pausado = !pausado;
+  $('btnPausar').textContent = pausado ? '▶️ Continuar' : '⏸️ Pausar';
+  $('btnPausar').classList.toggle('ativo', pausado); }
+$('btnPausar').addEventListener('click', alternarPausa);
+$('btnReset').addEventListener('click', ()=>{ montarCraque(L/2, Math.min(300, A*0.35), POSES.emPe); tocarSom('pop'); });
+$('btnPulo').addEventListener('click', ()=>{
+  if (!craque) return;
+  for (const n in craque.corpos){ const b=craque.corpos[n];
+    Body.setVelocity(b,{ x:b.velocity.x+(Math.random()-0.5)*4, y:-17-Math.random()*4 });
+    Body.setAngularVelocity(b,(Math.random()-0.5)*0.35); }
+  tocarSom('pop');
+});
+$('btnSom').addEventListener('click', ()=>{ somLigado=!somLigado;
+  $('btnSom').textContent = somLigado?'🔊 Som':'🔇 Mudo'; $('btnSom').classList.toggle('ativo',!somLigado); });
+$('btnLento').addEventListener('click', ()=>{ lento=!lento; $('btnLento').classList.toggle('ativo',lento); });
+$('btnLimpar').addEventListener('click', ()=>{ for (const o of [...objetos]) removerObjeto(o); });
+$('btnChuteira').addEventListener('click', ()=>{ chuteiras=!chuteiras;
+  $('btnChuteira').classList.toggle('ativo', chuteiras); });
+
+document.querySelectorAll('#poses .btn').forEach(b =>
+  b.addEventListener('click', ()=>aplicarPose(POSES[b.dataset.pose])));
+document.querySelectorAll('#tamanhos .btn').forEach(b =>
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('#tamanhos .btn').forEach(x=>x.classList.remove('ativo'));
+    b.classList.add('ativo'); escala = parseFloat(b.dataset.tam);
+    const t = craque?.corpos.tronco.position || {x:L/2,y:280};
+    montarCraque(t.x, t.y, POSES.emPe);
+  }));
+document.querySelectorAll('#adesivos .btn').forEach(b =>
+  b.addEventListener('click', ()=>{
+    const t = craque?.corpos.cabeca.position || {x:L/2,y:150};
+    soltarEmoji(t.x + (Math.random()-0.5)*120, Math.max(60, t.y-140), b.dataset.emoji);
+    tocarSom('pop');
+  }));
+
+$('selFundo').addEventListener('change', ev => { fundoAtual = ev.target.value; pintarFundo(); });
+$('selGrav').addEventListener('change', ev => { engine.gravity.y = parseFloat(ev.target.value); });
+$('selFiltro').addEventListener('change', ev => { tela.style.filter = ev.target.value; });
+
+function tirarFoto(){
+  const c = document.createElement('canvas');
+  c.width = tela.width; c.height = tela.height;
+  const g = c.getContext('2d');
+  g.filter = $('selFiltro').value || 'none';
+  g.drawImage(tela, 0, 0);
+  const a = document.createElement('a');
+  a.download = 'ragdoll-do-craque.png'; a.href = c.toDataURL('image/png'); a.click();
+  tocarSom('pop');
+}
+$('btnFoto').addEventListener('click', tirarFoto);
+$('btnFoto2').addEventListener('click', tirarFoto);
+
+const TECLAS_FERR = {'1':'mao','2':'bola','3':'caixa','4':'bloco','5':'tnt','6':'explosao','7':'plataforma','8':'trampolim','9':'apagar'};
+addEventListener('keydown', ev => {
+  if (ev.target.tagName==='INPUT' || ev.target.tagName==='SELECT') return;
+  if (TECLAS_FERR[ev.key]) selecionarFerramenta(TECLAS_FERR[ev.key]);
+  else if (ev.key===' '){ ev.preventDefault(); alternarPausa(); }
+  else if (ev.key.toLowerCase()==='p') alternarPose();
+  else if (ev.key.toLowerCase()==='r') $('btnReset').click();
+});
+
+/* ---------------- redimensionar ---------------- */
+function ajustarTamanho(){
+  L = innerWidth; A = innerHeight; DPR = Math.min(devicePixelRatio||1, 2);
+  tela.width = L*DPR; tela.height = A*DPR;
+  tela.style.width = L+'px'; tela.style.height = A+'px';
+  chaoY = A - 64; criarLimites(); pintarFundo();
+}
+let resizeTimer;
+addEventListener('resize', ()=>{ clearTimeout(resizeTimer); resizeTimer = setTimeout(ajustarTamanho, 150); });
+
+/* ---------------- inicio ---------------- */
+async function iniciar(){
+  await Promise.all(Object.entries(PECAS_DADOS).map(([nome,d]) => new Promise(res => {
+    const img = new Image(); img.onload = ()=>{ imagens[nome]=img; res(); };
+    img.onerror = ()=>res(); img.src = d.file;
+  })));
+  if (!imgFoto.complete) await new Promise(r=>{ imgFoto.onload=r; imgFoto.onerror=r; });
+  ajustarTamanho();
+  montarCraque(L/2, Math.min(290, A*0.34), POSES.emPe);
+  soltarBola(L/2 - 220, 120); soltarBola(L/2 + 240, 80);
+  document.getElementById('carregando').style.display = 'none';
+  requestAnimationFrame(loop);
+}
+iniciar();
+</script>
+</body>
+</html>

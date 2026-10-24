@@ -161,6 +161,16 @@ Veja `protocol/PROTOCOL.md` para especificação completa.
 
 ---
 
+## ⚽ Extra: Ragdoll do Craque (sandbox da foto)
+
+Em [`ragdoll-sandbox/`](ragdoll-sandbox/) tem um joguinho onde uma foto vira um
+**boneco ragdoll articulado**: dá pra mexer os braços, mudar ele de lugar,
+explodir TNT, usar o fundo de Minecraft e tirar foto da pose.
+É só rodar `python3 -m http.server 8000` dentro da pasta e abrir no navegador —
+detalhes no [README de lá](ragdoll-sandbox/README.md).
+
+---
+
 ## 📄 Licença
 
 MIT — use livremente, mencione a ponte 🌉
