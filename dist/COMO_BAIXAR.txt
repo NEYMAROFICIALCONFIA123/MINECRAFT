@@ -1,0 +1,17 @@
+=== COMO BAIXAR SÓ O QUE TU PRECISA (SEM BAIXAR ZIP GIGANTE) ===
+
+1) UNITY (só 80kb):
+   Link direto: https://github.com/NEYMAROFICIALCONFIA123/MINECRAFT/raw/arena/cdaf6e80-minecraft/dist/unity-package.zip
+   Baixa esse zip > descompacta > na Unity: Package Manager > + > Add from disk > seleciona unity-package/package.json
+
+   OU baixa só a pasta via site: https://download-directory.github.io/
+   Cola: https://github.com/NEYMAROFICIALCONFIA123/MINECRAFT/tree/arena/cdaf6e80-minecraft/unity-package
+
+2) MINECRAFT JAR (só 40kb):
+   Link Actions (recomendado): https://github.com/NEYMAROFICIALCONFIA123/MINECRAFT/actions
+   > Clica no último "Build Ponte JAR" > Artifacts > minecraft-unity-ponte-JAR
+
+   Fallback source: https://github.com/NEYMAROFICIALCONFIA123/MINECRAFT/raw/arena/cdaf6e80-minecraft/dist/minecraft-mod-source.zip
+
+3) NÃO PRECISA BAIXAR O REPO TODO!
+   Só esses 2 arquivos acima.

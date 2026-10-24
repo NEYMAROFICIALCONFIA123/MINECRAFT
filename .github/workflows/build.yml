@@ -1,0 +1,35 @@
+name: Build Ponte JAR
+
+on:
+  push:
+    branches: [ "arena/cdaf6e80-minecraft" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Build mod with Gradle
+        working-directory: minecraft-mod
+        run: |
+          chmod +x gradlew || true
+          # Se não tem wrapper, usa gradle do sistema
+          if [ -f "./gradlew" ]; then ./gradlew build --no-daemon
+          else gradle build --no-daemon || ./gradlew build --no-daemon; fi
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: minecraft-unity-ponte-JAR
+          path: minecraft-mod/build/libs/*.jar
+          if-no-files-found: error
+      - name: Upload Unity package
+        uses: actions/upload-artifact@v4
+        with:
+          name: unity-package
+          path: unity-package/
