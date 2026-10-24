@@ -1,0 +1,81 @@
+{
+  "name": "Minecraft Unity Ponte Protocol",
+  "version": "1.0.0",
+  "transport": ["tcp-json-lines", "websocket"],
+  "defaultPorts": { "tcp": 25566, "websocket": 25565 },
+  "encoding": "utf-8",
+  "framing": "newline-delimited JSON (one JSON object per line, \\n) over TCP; RFC6455 frames over WS with text opcode",
+  "directions": {
+    "minecraft_to_unity": [
+      {
+        "type": "hello",
+        "fields": { "version": "string", "world": "string", "motd": "string" },
+        "description": "Enviado ao conectar. Confirma versão do protocolo."
+      },
+      {
+        "type": "worldInfo",
+        "fields": { "dimension": "string", "spawn": "{x,y,z}", "time": "long", "raining": "bool", "thundering": "bool" },
+        "description": "Info do mundo ao iniciar sync."
+      },
+      {
+        "type": "blockUpdate",
+        "fields": { "x": "int", "y": "int", "z": "int", "block": "string (ex minecraft:stone)" },
+        "description": "Mudança de um único bloco (place/break/pintar)."
+      },
+      {
+        "type": "blockBulk",
+        "fields": { "blocks": "BlockEntry[]" },
+        "description": "Lote de blocos (coalescido dentro de ~16ms). Mais eficiente que N blockUpdate."
+      },
+      {
+        "type": "chunkData",
+        "fields": { "chunkX": "int", "chunkZ": "int", "blocks": "BlockEntry[]", "count": "int" },
+        "description": "Chunk inicial (todos blocos não-ar). Enviado ao conectar, em batches de ~2500 blocos."
+      },
+      {
+        "type": "syncComplete",
+        "fields": { "chunksSent": "int" },
+        "description": "Fim do sync inicial."
+      },
+      {
+        "type": "timeUpdate",
+        "fields": { "time": "long (0-24000)", "isDay": "bool" },
+        "description": "Tick de tempo (1/s)."
+      },
+      {
+        "type": "weatherUpdate",
+        "fields": { "weather": "clear|rain|thunder" },
+        "description": "Mudança de clima."
+      },
+      {
+        "type": "chat",
+        "fields": { "message": "string", "from": "string" },
+        "description": "Chat do MC espelhado."
+      },
+      {
+        "type": "playerJoin",
+        "fields": { "player": "string", "uuid": "string", "x": "double", "y": "double", "z": "double" }
+      },
+      {
+        "type": "playerLeave",
+        "fields": { "player": "string" }
+      }
+    ],
+    "unity_to_minecraft": [
+      { "type": "setBlock", "fields": { "x": "int", "y": "int", "z": "int", "block": "string" }, "description": "Coloca/remove bloco. Use minecraft:air para deletar." },
+      { "type": "setBlockColor", "fields": { "x": "int", "y": "int", "z": "int", "color": "#RRGGBB", "material": "concrete|wool|terracotta" }, "description": "Pinta bloco (converte para bloco colorido mais próximo)." },
+      { "type": "fill", "fields": { "from": "{x,y,z}", "to": "{x,y,z}", "block": "string" }, "description": "Preenche volume (max 10000)." },
+      { "type": "setTime", "fields": { "time": "long" }, "description": "0=amanhecer,6000=meio-dia,12000=anoitecer,18000=meia-noite" },
+      { "type": "setWeather", "fields": { "weather": "clear|rain|thunder" } },
+      { "type": "teleport", "fields": { "x": "double", "y": "double", "z": "double", "player?": "string" }, "description": "Teleporta player." },
+      { "type": "chat", "fields": { "message": "string", "from?": "string" } },
+      { "type": "command", "fields": { "command": "string" }, "description": "Executa comando como console (se allowCommands)." },
+      { "type": "requestChunk", "fields": { "chunkX": "int", "chunkZ": "int" } },
+      { "type": "ping", "fields": { "id?": "any" }, "response": "pong" }
+    ]
+  },
+  "example": {
+    "minecraft_to_unity": "{\"type\":\"blockUpdate\",\"x\":10,\"y\":64,\"z\":-5,\"block\":\"minecraft:stone\"}\n",
+    "unity_to_minecraft": "{\"type\":\"setBlock\",\"x\":10,\"y\":65,\"z\":-5,\"block\":\"minecraft:glass\"}\n"
+  }
+}

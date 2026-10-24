@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "minecraft-unity-ponte",
+  "version": "${version}",
+  "name": "Minecraft Unity Ponte",
+  "description": "Ponte bidirecional Minecraft -> Unity. Sincroniza blocos em tempo real, permite pintar/deletar e controlar tempo/clima pela Unity.",
+  "authors": ["Ponte Team"],
+  "contact": {
+    "homepage": "https://github.com/NEYMAROFICIALCONFIA123/MINECRAFT",
+    "sources": "https://github.com/NEYMAROFICIALCONFIA123/MINECRAFT"
+  },
+  "license": "MIT",
+  "icon": "assets/ponte/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.ponte.mcunity.MinecraftUnityBridgeMod"
+    ]
+  },
+  "mixins": [
+    "ponte.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.0",
+    "fabric-api": "*",
+    "minecraft": "1.20.x",
+    "java": ">=17"
+  },
+  "suggests": {}
+}

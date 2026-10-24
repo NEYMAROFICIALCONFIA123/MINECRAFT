@@ -1,0 +1,58 @@
+# Gradle
+.gradle/
+build/
+out/
+run/
+remappedSrc/
+loom-cache/
+
+# Java
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+sysinfo.txt
+*.stackdump
+.crashlytics/
+*.pid
+[Aa]ssets/AddressableAssetsData/*/*.bin*
+[Aa]ssets/[Ss]treamingAssets/aa.meta
+[Aa]ssets/[Ss]treamingAssets/aa/*
+Packages/packages-lock.json
+.vs/
+.vscode/ !.vscode/
+.idea/
+*.apk
+*.aab
+
+# Node relay
+node_modules/
+relay/dist/
+
+# OS
+.DS_Store
+Thumbs.db
