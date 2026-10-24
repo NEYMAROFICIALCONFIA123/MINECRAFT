@@ -10,6 +10,7 @@ loom-cache/
 *.class
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
+!minecraft-mod/gradle/wrapper/gradle-wrapper.jar
 !dist/*.jar
 !dist/*.zip
 

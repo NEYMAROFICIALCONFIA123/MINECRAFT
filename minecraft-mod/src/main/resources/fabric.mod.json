@@ -3,7 +3,7 @@
   "id": "minecraft-unity-ponte",
   "version": "${version}",
   "name": "Minecraft Unity Ponte",
-  "description": "Ponte bidirecional Minecraft -> Unity.",
+  "description": "Ponte bidirecional Minecraft <-> Unity/Godot. SEM MIXIN (compativel TLauncher).",
   "authors": ["Ponte Team"],
   "contact": {
     "homepage": "https://github.com/NEYMAROFICIALCONFIA123/MINECRAFT"
@@ -15,9 +15,6 @@
       "com.ponte.mcunity.MinecraftUnityBridgeMod"
     ]
   },
-  "mixins": [
-    "ponte.mixins.json"
-  ],
   "depends": {
     "fabricloader": ">=0.14.0",
     "fabric-api": "*",

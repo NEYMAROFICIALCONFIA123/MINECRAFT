@@ -1,0 +1,26 @@
+#!/bin/sh
+# Minimal gradlew stub - baixa Gradle via wrapper
+set -e
+GRADLE_VERSION=8.7
+if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+  echo "Baixando Gradle Wrapper..."
+  mkdir -p gradle/wrapper
+  # tenta baixar wrapper jar
+  if command -v curl >/dev/null 2>&1; then
+    curl -sL https://github.com/gradle/gradle/raw/master/gradle/wrapper/gradle-wrapper.jar -o gradle/wrapper/gradle-wrapper.jar 2>&1 || true
+  fi
+  if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ] && command -v wget >/dev/null 2>&1; then
+    wget -q https://github.com/gradle/gradle/raw/master/gradle/wrapper/gradle-wrapper.jar -O gradle/wrapper/gradle-wrapper.jar 2>&1 || true
+  fi
+fi
+if [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+  exec java -jar gradle/wrapper/gradle-wrapper.jar "$@"
+else
+  if command -v gradle >/dev/null 2>&1; then
+    exec gradle "$@"
+  else
+    echo "ERRO: Gradle não encontrado. Instale Gradle ou baixe Wrapper."
+    echo "Alternativa: use o JAR compilado via GitHub Actions (aba Actions)"
+    exit 1
+  fi
+fi
